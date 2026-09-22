@@ -1,0 +1,13 @@
+.template {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100dvh - 64px);
+  padding: 32px 16px;
+}
+
+.content {
+  width: 100%;
+  max-width: 480px;
+}
