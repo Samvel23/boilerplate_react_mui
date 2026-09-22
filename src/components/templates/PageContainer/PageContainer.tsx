@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 import {
-  AppContainer,
+  Container,
   type IAppContainerProps,
 } from "@/components";
 
@@ -15,11 +15,11 @@ export function PageContainer({
   ...props
 }: IPageContainerProps) {
   return (
-    <AppContainer
+    <Container
       maxWidth="lg"
       {...props}
     >
       {children}
-    </AppContainer>
+    </Container>
   );
 }

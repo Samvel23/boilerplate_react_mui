@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 
 import {
-  AppButton,
+  Button,
   FormField,
   FormActions,
   AppTextField,
@@ -95,10 +95,10 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       </FormField>
 
       <FormActions>
-        <AppButton type="submit" variant="contained" size="large" fullWidth>
+        <Button type="submit" variant="contained" size="large" fullWidth>
           Login
-        </AppButton>
+        </Button>
       </FormActions>
     </form>
   );
-}
+};

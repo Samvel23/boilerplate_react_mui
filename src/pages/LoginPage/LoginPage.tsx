@@ -1,6 +1,6 @@
 import Typography from "@mui/material/Typography";
 
-import { AppCard, AuthTemplate, LoginForm } from "@/components";
+import { Card, AuthTemplate, LoginForm } from "@/components";
 
 import styles from "./LoginPage.module.scss";
 
@@ -11,7 +11,7 @@ export const LoginPage = () => {
 
   return (
     <AuthTemplate>
-      <AppCard className={styles.card}>
+      <Card className={styles.card}>
         <Typography component="h2" variant="h4" gutterBottom>
           Welcome back
         </Typography>
@@ -21,7 +21,7 @@ export const LoginPage = () => {
         </Typography>
 
         <LoginForm onSubmit={handleLogin} />
-      </AppCard>
+      </Card>
     </AuthTemplate>
   );
 };

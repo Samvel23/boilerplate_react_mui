@@ -1,7 +1,7 @@
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
-import { AppIconButton } from "../IconButton";
+import { IconButton } from "../IconButton";
 import { useThemeMode } from "@/components";
 
 export const ThemeToggle = () => {
@@ -10,11 +10,11 @@ export const ThemeToggle = () => {
   const isDarkMode = mode === "dark";
 
   return (
-    <AppIconButton
+    <IconButton
       onClick={toggleMode}
       aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
     >
       {isDarkMode ? <LightModeIcon /> : <DarkModeIcon />}
-    </AppIconButton>
+    </IconButton>
   );
 };

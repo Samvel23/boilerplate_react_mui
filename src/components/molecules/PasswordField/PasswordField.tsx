@@ -5,7 +5,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
 import {
-  AppIconButton,
+  IconButton,
   AppTextField,
   type TAppTextFieldProps,
 } from "@/components";
@@ -29,13 +29,13 @@ export const PasswordField = ({ slotProps, ...props }: IPasswordFieldProps) => {
           ...slotProps?.input,
           endAdornment: (
             <InputAdornment position="end">
-              <AppIconButton
+              <IconButton
                 onClick={toggleVisibility}
                 edge="end"
                 aria-label={visible ? "Hide password" : "Show password"}
               >
                 {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
-              </AppIconButton>
+              </IconButton>
             </InputAdornment>
           ),
         },
