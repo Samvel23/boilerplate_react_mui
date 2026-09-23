@@ -44,7 +44,7 @@ export const ThemeModeProvider = ({ children }: IThemeModeProviderProps) => {
   );
 };
 
-export function useThemeMode() {
+export const useThemeMode = () => {
   const context = useContext(ThemeModeContext);
 
   if (!context) {
@@ -52,4 +52,4 @@ export function useThemeMode() {
   }
 
   return context;
-}
+};

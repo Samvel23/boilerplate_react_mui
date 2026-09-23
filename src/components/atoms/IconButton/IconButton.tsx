@@ -5,6 +5,6 @@ import {
 
 export interface IAppIconButtonProps extends IconButtonProps {}
 
-export const IconButton = ({ children, ...props }: IAppIconButtonProps) => {
-  return <MuiIconButton {...props}>{children}</MuiIconButton>;
-};
+export const IconButton = ({ children, ...props }: IAppIconButtonProps) => (
+  <MuiIconButton {...props}>{children}</MuiIconButton>
+);

@@ -4,6 +4,8 @@ import { createRoot } from "react-dom/client";
 import { ThemeModeProvider, ThemeRegistry } from "@/components";
 import App from "./App";
 
+import "./Language/i18n"
+
 import "@/styles/globals.scss";
 
 createRoot(document.getElementById("root")!).render(

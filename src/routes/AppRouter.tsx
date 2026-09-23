@@ -6,7 +6,7 @@ import { LoginPage } from "@/pages";
 export const AppRouter = () => {
   return (
     <BrowserRouter>
-      <Shell title="React MUI Boilerplate">
+      <Shell>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
 
