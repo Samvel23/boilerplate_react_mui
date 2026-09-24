@@ -1,6 +1,13 @@
 .header {
   width: 100%;
   border-bottom: 1px solid var(--mui-palette-divider);
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  width: 100%;
+  padding: 12px 24px;
 }
 
 .content {
@@ -24,4 +31,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  cursor: pointer;
 }

@@ -1,31 +1,58 @@
-import type { ReactNode } from "react";
+import { useState } from "react";
+import { Avatar, Menu, MenuItem, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-import { ThemeToggle } from "@/components";
+import { useUserStore } from "@/stores/useUserStore";
 
 import styles from "./Header.module.scss";
 
-export interface IAppHeaderProps {
-  title?: string;
-  children?: ReactNode;
-  showThemeToggle?: boolean;
-}
+export const Header = () => {
+  const navigate = useNavigate();
 
-export const Header = ({
-  title = "React MUI App",
-  children,
-  showThemeToggle = true,
-}: IAppHeaderProps) => {
+  const user = useUserStore((state) => state.user);
+  const removeCredentials = useUserStore((state) => state.removeCredentials);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const isMenuOpen = Boolean(anchorEl);
+
+  if (!user) {
+    return null;
+  }
+
+  const fullName = `${user.firstName} ${user.lastName}`;
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    removeCredentials();
+    handleMenuClose();
+
+    navigate("/login", { replace: true });
+  };
+
   return (
     <header className={styles.header}>
-      <div className={styles.content}>
-        <h1 className={styles.title}>{title}</h1>
+      <div className={styles.user}>
+        <Typography variant="body1">{fullName}</Typography>
 
-        <div className={styles.actions}>
-          {children}
-
-          {showThemeToggle && <ThemeToggle />}
-        </div>
+        <Avatar
+          src={user.image}
+          alt={fullName}
+          onClick={handleMenuOpen}
+          className={styles.avatar}
+        />
       </div>
+
+      <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
+        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+      </Menu>
     </header>
   );
-}
+};

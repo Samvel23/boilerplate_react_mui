@@ -1,18 +1,26 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
+import { LoginPage, ProductsPage } from "@/pages";
 import { Shell } from "@/components";
-import { LoginPage } from "@/pages";
+
+import { ProtectedRoute } from "./ProtectedRoute";
+import { PublicRoute } from "./PublicRoute";
 
 export const AppRouter = () => {
   return (
-    <BrowserRouter>
-      <Shell>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Shell>
-    </BrowserRouter>
+      <Route element={<ProtectedRoute />}>
+        <Route element={<Shell />}>
+          <Route path="/" element={<div>Home</div>} />
+          <Route path="/products" element={<ProductsPage />} />
+        </Route>
+      </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 };

@@ -9,7 +9,7 @@ import styles from "./LoginPage.module.scss";
 export const LoginPage = () => {
   const { t } = useTranslation();
 
-  const handleLogin = (values: { email: string; password: string }) => {
+  const handleLogin = (values: { name: string; password: string }) => {
     console.log("Login values:", values);
   };
 

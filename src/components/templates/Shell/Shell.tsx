@@ -1,21 +1,17 @@
-import type { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 
 import { Header } from "@/components";
 
 import styles from "./Shell.module.scss";
-import { useStore } from "@/stores/useStore";
 
-export interface IShellProps {
-  children: ReactNode;
-}
-
-export const Shell = ({ children }: IShellProps) => {
-  const header = useStore((s) => s.appContent.heading);
+export const Shell = () => {
   return (
     <div className={styles.shell}>
-      <Header title={header} />
+      <Header />
 
-      <main className={styles.main}>{children}</main>
+      <main className={styles.content}>
+        <Outlet />
+      </main>
     </div>
   );
 };

@@ -1,15 +1,9 @@
-export const validateEmail = (email: string): string | undefined => {
-  if (!email.trim()) {
-    return "Email is required";
+export const validateName = (name: string) => {
+  if (!name.trim()) {
+    return "Username is required";
   }
 
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailPattern.test(email)) {
-    return "Please enter a valid email address";
-  }
-
-  return undefined;
+  return "";
 };
 
 export const validatePassword = (password: string): string | undefined => {

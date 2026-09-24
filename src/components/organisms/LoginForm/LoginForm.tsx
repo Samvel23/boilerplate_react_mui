@@ -10,32 +10,33 @@ import {
 
 import type { ILoginFormValues } from "@/types/forms";
 
-import { validateEmail, validatePassword } from "@/utils/validation";
+import { validateName, validatePassword } from "@/utils/validation";
 
 import styles from "./LoginForm.module.scss";
+import { loginAuth } from "@/api/auth/loginAuth";
+import { useUserStore } from "@/stores/useUserStore";
 
 export interface ILoginFormProps {
   onSubmit?: (values: ILoginFormValues) => void;
 }
 
 interface ILoginFormErrors {
-  email?: string;
+  name?: string;
   password?: string;
 }
 
 export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
   const [values, setValues] = useState<ILoginFormValues>({
-    email: "",
-    password: "",
+    name: "emilys",
+    password: "emilyspass",
   });
 
   const [errors, setErrors] = useState<ILoginFormErrors>({});
-  
 
-  const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues((current) => ({
       ...current,
-      email: event.target.value,
+      name: event.target.value,
     }));
   };
 
@@ -46,15 +47,15 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
     }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const nextErrors: ILoginFormErrors = {};
 
-    const emailError = validateEmail(values.email);
+    const nameError = validateName(values.name);
 
-    if (emailError) {
-      nextErrors.email = emailError;
+    if (nameError) {
+      nextErrors.name = nameError;
     }
 
     const passwordError = validatePassword(values.password);
@@ -69,19 +70,38 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       return;
     }
 
-    onSubmit?.(values);
+    try {
+      const res = await loginAuth(values.name, values.password);
+
+      
+      const { accessToken, refreshToken, ...user } = res.data;
+      
+      console.log("accessToken:", accessToken);
+      console.log("refreshToken:", refreshToken);
+
+      useUserStore.getState().setUser(user);
+
+      useUserStore.getState().setCredentials({
+        accessToken,
+        refreshToken,
+      });
+
+      onSubmit?.(values);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <FormField error={errors.email}>
+      <FormField error={errors.name}>
         <AppTextField
-          label="Email"
-          type="email"
-          value={values.email}
-          onChange={handleEmailChange}
-          error={Boolean(errors.email)}
-          autoComplete="email"
+          label="Username"
+          type="text"
+          value={values.name}
+          onChange={handleNameChange}
+          error={Boolean(errors.name)}
+          autoComplete="username"
         />
       </FormField>
 
