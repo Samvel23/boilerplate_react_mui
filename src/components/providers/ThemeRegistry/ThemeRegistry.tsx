@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+
+import { useThemeMode } from "@/hooks";
+
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
-import { useThemeMode } from "../ThemeMode";
 import { createAppTheme } from "@/theme/theme";
 
 interface ThemeRegistryProps {

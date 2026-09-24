@@ -1,7 +1,7 @@
 import { Container as MuiContainer, type ContainerProps } from "@mui/material";
 
-export interface IAppContainerProps extends ContainerProps {}
+export type TAppContainerProps = ContainerProps 
 
-export const Container = ({ children, ...props }: IAppContainerProps) => (
+export const Container = ({ children, ...props }: TAppContainerProps) => (
   <MuiContainer {...props}>{children}</MuiContainer>
 );

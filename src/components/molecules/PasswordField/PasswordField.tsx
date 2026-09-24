@@ -10,9 +10,9 @@ import {
   type TAppTextFieldProps,
 } from "@/components";
 
-export interface IPasswordFieldProps extends Omit<TAppTextFieldProps, "type"> {}
+export type TPasswordFieldProps = Omit<TAppTextFieldProps, "type">;
 
-export const PasswordField = ({ slotProps, ...props }: IPasswordFieldProps) => {
+export const PasswordField = ({ slotProps, ...props }: TPasswordFieldProps) => {
   const [visible, setVisible] = useState(false);
 
   const toggleVisibility = () => {
@@ -42,4 +42,4 @@ export const PasswordField = ({ slotProps, ...props }: IPasswordFieldProps) => {
       }}
     />
   );
-}
+};

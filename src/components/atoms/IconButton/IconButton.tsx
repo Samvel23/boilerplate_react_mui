@@ -3,8 +3,8 @@ import {
   type IconButtonProps,
 } from "@mui/material";
 
-export interface IAppIconButtonProps extends IconButtonProps {}
+export type TAppIconButtonProps = IconButtonProps 
 
-export const IconButton = ({ children, ...props }: IAppIconButtonProps) => (
+export const IconButton = ({ children, ...props }: TAppIconButtonProps) => (
   <MuiIconButton {...props}>{children}</MuiIconButton>
 );

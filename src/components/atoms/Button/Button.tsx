@@ -1,7 +1,7 @@
 import { Button as MuiButton, type ButtonProps } from "@mui/material";
 
-export interface IAppButtonProps extends ButtonProps {}
+export type TAppButtonProps = ButtonProps 
 
-export const Button = ({ children, ...props }: IAppButtonProps) => (
+export const Button = ({ children, ...props }: TAppButtonProps) => (
   <MuiButton {...props}>{children}</MuiButton>
 );

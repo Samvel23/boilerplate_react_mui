@@ -1,22 +1,7 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useState,
-  useMemo,
-  type ReactNode,
-} from "react";
+import { useCallback, useState, useMemo, type ReactNode } from "react";
 
 import type { TThemeMode } from "@/theme/theme";
-
-interface IThemeModeContextValue {
-  mode: TThemeMode;
-  toggleMode: VoidFunction;
-}
-
-const ThemeModeContext = createContext<IThemeModeContextValue | undefined>(
-  undefined,
-);
+import { ThemeModeContext } from "@/context";
 
 interface IThemeModeProviderProps {
   children: ReactNode;
@@ -42,14 +27,4 @@ export const ThemeModeProvider = ({ children }: IThemeModeProviderProps) => {
       {children}
     </ThemeModeContext.Provider>
   );
-};
-
-export const useThemeMode = () => {
-  const context = useContext(ThemeModeContext);
-
-  if (!context) {
-    throw new Error("useThemeMode must be used within ThemeModeProvider");
-  }
-
-  return context;
 };
