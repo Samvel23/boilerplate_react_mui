@@ -1,4 +1,4 @@
-import { useUserStore } from "@/stores/user-store";
+import { useUserStore } from "@/stores/useUserStore";
 import type { InternalAxiosRequestConfig } from "axios";
 
 export function requestInterceptor(config: InternalAxiosRequestConfig) {

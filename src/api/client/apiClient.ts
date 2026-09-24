@@ -13,8 +13,6 @@ export const apiClient = axios.create({
   },
 });
 
-// auth token logic, + refresh token
-
 apiClient.interceptors.request.use(requestInterceptor);
 
 apiClient.interceptors.response.use(
