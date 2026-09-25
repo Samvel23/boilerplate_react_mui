@@ -7,6 +7,7 @@ interface ISearchProductsParams {
   skip?: number;
   sortBy?: string;
   order?: "asc" | "desc";
+  signal?: AbortSignal;
 }
 
 export const searchProducts = ({
@@ -15,6 +16,7 @@ export const searchProducts = ({
   skip = 0,
   sortBy,
   order,
+  signal,
 }: ISearchProductsParams) => {
   return apiClient.get<IProductsResponse>("/products/search", {
     params: {
@@ -23,6 +25,7 @@ export const searchProducts = ({
       skip,
       ...(sortBy && { sortBy }),
       ...(order && { order }),
+      signal,
     },
   });
 };

@@ -7,14 +7,16 @@ interface IGetProductsByCategoryParams {
   skip?: number;
   sortBy?: string;
   order?: "asc" | "desc";
+  signal?: AbortSignal;
 }
 
 export const getProductsByCategory = ({
   category,
-  limit = 10,
+  limit = 10,       
   skip = 0,
   sortBy,
   order,
+  signal,
 }: IGetProductsByCategoryParams) => {
   return apiClient.get<IProductsResponse>(`/products/category/${category}`, {
     params: {
@@ -22,6 +24,7 @@ export const getProductsByCategory = ({
       skip,
       ...(sortBy && { sortBy }),
       ...(order && { order }),
+      signal,
     },
   });
 };

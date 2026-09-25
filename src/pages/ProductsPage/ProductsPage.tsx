@@ -1,22 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Typography,
-  TableSortLabel,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  type SelectChangeEvent,
-} from "@mui/material";
-import { useSearchParams } from "react-router-dom";
+import { Paper, TableContainer, Typography } from "@mui/material";
 
 import {
   getCategories,
@@ -24,28 +7,41 @@ import {
   getProductsByCategory,
   searchProducts,
 } from "@/api/products";
+
 import type { ICategory, IProduct } from "@/types/products";
 import { useDebounce } from "@/hooks/useDebounce";
-import { TextField } from "@/components";
+
+import {
+  ProductCategoryFilter,
+  ProductPagination,
+  ProductSearch,
+  ProductTable,
+} from "./elements";
+
+import { useProductParams } from "./hooks";
 
 export const ProductsPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  const page = Number(searchParams.get("page") ?? 0);
-  const limit = Number(searchParams.get("limit") ?? 10);
-
-  const sortBy = searchParams.get("sortBy") ?? "";
-
-  const orderParam = searchParams.get("order") as "asc" | "desc";
-  const order: "asc" | "desc" =
-    orderParam === "asc" ? "asc" : orderParam === "desc" ? "desc" : "asc";
-
-  const category = searchParams.get("category");
-  const search = searchParams.get("search") ?? "";
+  const {
+    page,
+    limit,
+    sortBy,
+    order,
+    category,
+    search,
+    searchParams,
+    setSearchParams,
+    handleSort,
+    handlePageChange,
+    handleCategoryChange,
+    handleRowsPerPageChange,
+  } = useProductParams();
 
   const [products, setProducts] = useState<IProduct[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [searchInput, setSearchInput] = useState(search);
 
@@ -74,9 +70,13 @@ export const ProductsPage = () => {
 
   // Fetch products
   useEffect(() => {
+    const controller = new AbortController();
+    let isCurrent = true;
+
     const fetchProducts = async () => {
       try {
         setLoading(true);
+        setError(false);
 
         const skip = page * limit;
 
@@ -89,6 +89,7 @@ export const ProductsPage = () => {
             skip,
             sortBy,
             order,
+            signal: controller.signal,
           });
         } else if (category) {
           response = await getProductsByCategory({
@@ -97,6 +98,7 @@ export const ProductsPage = () => {
             skip,
             sortBy,
             order,
+            signal: controller.signal,
           });
         } else {
           response = await getProducts({
@@ -104,18 +106,41 @@ export const ProductsPage = () => {
             skip,
             sortBy,
             order,
+            signal: controller.signal,
           });
+        }
+
+        if (!isCurrent) {
+          return;
         }
 
         setProducts(response.data.products);
         setTotal(response.data.total);
+      } catch (error) {
+        if (controller.signal.aborted) {
+          return;
+        }
+
+        if (!isCurrent) {
+          return;
+        }
+
+        setError(true);
+        console.error("Fetching products failed", error);
       } finally {
-        setLoading(false);
+        if (isCurrent) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProducts();
-  }, [page, limit, sortBy, order, category, search]);
+
+    return () => {
+      isCurrent = false;
+      controller.abort();
+    };
+  }, [page, limit, sortBy, order, category, search, retryCount]);
 
   // Fetch categories
   useEffect(() => {
@@ -128,60 +153,8 @@ export const ProductsPage = () => {
     fetchCategories();
   }, []);
 
-  const handleSort = (field: string) => {
-    let newOrder: "asc" | "desc";
-
-    if (field === sortBy) {
-      newOrder = order === "asc" ? "desc" : "asc";
-    } else {
-      newOrder = "asc";
-    }
-
-    const params = new URLSearchParams(searchParams);
-
-    params.set("page", "0");
-    params.set("limit", String(limit));
-    params.set("sortBy", field);
-    params.set("order", newOrder);
-
-    setSearchParams(params);
-  };
-
-  const handlePageChange = (_event: unknown, newPage: number) => {
-    const params = new URLSearchParams(searchParams);
-
-    params.set("page", String(newPage));
-    params.set("limit", String(limit));
-
-    setSearchParams(params);
-  };
-
-  const handleCategoryChange = (event: SelectChangeEvent) => {
-    const newCategory = event.target.value;
-
-    const params = new URLSearchParams(searchParams);
-
-    params.set("page", "0");
-    params.set("limit", String(limit));
-
-    if (newCategory) {
-      params.set("category", newCategory);
-    } else {
-      params.delete("category");
-    }
-
-    setSearchParams(params);
-  };
-
-  const handleRowsPerPageChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const params = new URLSearchParams(searchParams);
-
-    params.set("page", "0");
-    params.set("limit", event.target.value);
-
-    setSearchParams(params);
+  const handleRetry = () => {
+    setRetryCount((count) => count + 1);
   };
 
   return (
@@ -190,100 +163,31 @@ export const ProductsPage = () => {
         Products
       </Typography>
 
-      <TextField
-        label="Search products"
-        value={searchInput}
-        onChange={(event) => {
-          setSearchInput(event.target.value);
-        }}
-      />
+      <ProductSearch value={searchInput} onChange={setSearchInput} />
 
       <TableContainer component={Paper}>
-        <FormControl>
-          <InputLabel>Category</InputLabel>
+        <ProductCategoryFilter
+          value={category ?? ""}
+          categories={categories}
+          onChange={handleCategoryChange}
+        />
 
-          <Select
-            value={category ?? ""}
-            label="Category"
-            onChange={handleCategoryChange}
-          >
-            <MenuItem value="">All</MenuItem>
+        <ProductTable
+          products={products}
+          loading={loading}
+          error={error}
+          sortBy={sortBy}
+          order={order}
+          onSort={handleSort}
+          onRetry={handleRetry}
+        />
 
-            {categories.map((item) => (
-              <MenuItem key={item.slug} value={item.slug}>
-                {item.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Product</TableCell>
-              <TableCell>Category</TableCell>
-
-              <TableCell>
-                <TableSortLabel
-                  active={sortBy === "price"}
-                  direction={sortBy === "price" ? order : "asc"}
-                  onClick={() => handleSort("price")}
-                >
-                  Price
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell>
-                <TableSortLabel
-                  active={sortBy === "rating"}
-                  direction={sortBy === "rating" ? order : "asc"}
-                  onClick={() => handleSort("rating")}
-                >
-                  Rating
-                </TableSortLabel>
-              </TableCell>
-
-              <TableCell>
-                <TableSortLabel
-                  active={sortBy === "stock"}
-                  direction={sortBy === "stock" ? order : "asc"}
-                  onClick={() => handleSort("stock")}
-                >
-                  Stock
-                </TableSortLabel>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6}>Loading...</TableCell>
-              </TableRow>
-            ) : (
-              products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>{product.id}</TableCell>
-                  <TableCell>{product.title}</TableCell>
-                  <TableCell>{product.category}</TableCell>
-                  <TableCell>${product.price}</TableCell>
-                  <TableCell>{product.rating}</TableCell>
-                  <TableCell>{product.stock}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        <TablePagination
-          component="div"
-          count={total}
+        <ProductPagination
           page={page}
-          rowsPerPage={limit}
+          limit={limit}
+          total={total}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleRowsPerPageChange}
-          rowsPerPageOptions={[5, 10, 20, 30]}
         />
       </TableContainer>
     </div>
