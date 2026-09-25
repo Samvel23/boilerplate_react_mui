@@ -1,7 +1,7 @@
-import { TextField, type TextFieldProps } from "@mui/material";
+import { TextField as MuiTextField, type TextFieldProps } from "@mui/material";
 
-export type TAppTextFieldProps = TextFieldProps;
+export type TTextFieldProps = TextFieldProps;
 
-export const AppTextField = ({ children, ...props }: TAppTextFieldProps) => (
-  <TextField {...props}>{children}</TextField>
+export const TextField = ({ children, ...props }: TTextFieldProps) => (
+  <MuiTextField {...props}>{children}</MuiTextField>
 );

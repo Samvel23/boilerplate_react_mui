@@ -4,7 +4,7 @@ import {
   Button,
   FormField,
   FormActions,
-  AppTextField,
+  TextField,
   PasswordField,
 } from "@/components";
 
@@ -95,7 +95,7 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <FormField error={errors.name}>
-        <AppTextField
+        <TextField
           label="Username"
           type="text"
           value={values.name}

@@ -10,16 +10,22 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@axe-core/react": "^4.13.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.4.0",
     "@mui/material": "^9.4.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
     "axios": "^1.20.0",
     "i18next": "^26.4.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-i18next": "^17.0.15",
     "react-router-dom": "^7.18.4",
+    "recharts": "^3.10.1",
+    "vitest": "^5.0.1",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

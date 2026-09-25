@@ -4,13 +4,9 @@ import InputAdornment from "@mui/material/InputAdornment";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 
-import {
-  IconButton,
-  AppTextField,
-  type TAppTextFieldProps,
-} from "@/components";
+import { IconButton, TextField, type TTextFieldProps } from "@/components";
 
-export type TPasswordFieldProps = Omit<TAppTextFieldProps, "type">;
+export type TPasswordFieldProps = Omit<TTextFieldProps, "type">;
 
 export const PasswordField = ({ slotProps, ...props }: TPasswordFieldProps) => {
   const [visible, setVisible] = useState(false);
@@ -20,7 +16,7 @@ export const PasswordField = ({ slotProps, ...props }: TPasswordFieldProps) => {
   };
 
   return (
-    <AppTextField
+    <TextField
       {...props}
       type={visible ? "text" : "password"}
       slotProps={{
