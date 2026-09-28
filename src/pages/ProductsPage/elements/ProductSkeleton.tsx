@@ -1,21 +1,47 @@
-import { TableCell, TableRow, Skeleton } from "@mui/material";
+import { Skeleton, TableCell, TableRow } from "@mui/material";
+
+import styles from "./ProductSkeleton.module.scss";
 
 export const ProductSkeleton = () => {
-  const count = 6;
+  const rows = 5;
+
   return (
     <>
-      <TableRow>
-        {[...Array(count)].map(() => (
+      {Array.from({ length: rows }).map((_, rowIndex) => (
+        <TableRow key={rowIndex} className={styles.row}>
           <TableCell>
-            <Skeleton
-              variant="rectangular"
-              animation="wave"
-              width={210}
-              height={60}
-            />
+            <Skeleton variant="text" width={40} />
           </TableCell>
-        ))}
-      </TableRow>
+
+          <TableCell>
+            <div className={styles.product}>
+              <Skeleton variant="rounded" width={48} height={48} />
+
+              <div className={styles.productInfo}>
+                <Skeleton variant="text" width={180} />
+
+                <Skeleton variant="text" width={100} />
+              </div>
+            </div>
+          </TableCell>
+
+          <TableCell>
+            <Skeleton variant="rounded" width={90} height={28} />
+          </TableCell>
+
+          <TableCell>
+            <Skeleton variant="text" width={70} />
+          </TableCell>
+
+          <TableCell>
+            <Skeleton variant="text" width={45} />
+          </TableCell>
+
+          <TableCell>
+            <Skeleton variant="rounded" width={55} height={28} />
+          </TableCell>
+        </TableRow>
+      ))}
     </>
   );
 };

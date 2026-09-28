@@ -1,0 +1,33 @@
+.form {
+  width: 100%;
+}
+
+.content {
+  gap: 24px;
+}
+
+.title {
+  margin-bottom: 4px !important;
+  font-weight: 700 !important;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.button {
+  align-self: flex-start;
+  min-width: 140px;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

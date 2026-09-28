@@ -1,0 +1,53 @@
+.pagination {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 !important;
+}
+
+.pagination :global(.MuiTablePagination-toolbar) {
+  min-height: 56px;
+  padding: 0;
+}
+
+.pagination :global(.MuiTablePagination-selectLabel),
+.pagination :global(.MuiTablePagination-displayedRows) {
+  color: var(--mui-palette-text-secondary);
+}
+
+.pagination :global(.MuiTablePagination-select) {
+  margin-left: 8px;
+  margin-right: 4px;
+}
+
+.pagination :global(.MuiTablePagination-actions) {
+  margin-left: 16px;
+}
+
+.pagination :global(.MuiIconButton-root) {
+  border-radius: 8px;
+}
+
+.pagination :global(.MuiIconButton-root:hover) {
+  background-color: var(--mui-palette-action-hover);
+}
+
+@media (max-width: 600px) {
+  .pagination :global(.MuiTablePagination-toolbar) {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 0;
+  }
+
+  .pagination :global(.MuiTablePagination-selectLabel) {
+    margin: 0;
+  }
+
+  .pagination :global(.MuiTablePagination-displayedRows) {
+    margin: 0;
+  }
+
+  .pagination :global(.MuiTablePagination-actions) {
+    margin-left: 0;
+  }
+}

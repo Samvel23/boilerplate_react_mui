@@ -1,0 +1,40 @@
+.info {
+  gap: 24px;
+}
+
+.chips {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.title {
+  font-size: 2.1rem !important;
+  font-weight: 700 !important;
+}
+
+.brand {
+  margin-top: 6px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.description {
+  line-height: 1.8 !important;
+}
+
+.price {
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.7rem !important;
+  }
+}

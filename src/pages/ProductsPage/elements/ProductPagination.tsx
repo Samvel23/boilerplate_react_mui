@@ -1,5 +1,7 @@
 import { TablePagination } from "@mui/material";
 
+import styles from "./ProductPagination.module.scss";
+
 interface ProductPaginationProps {
   page: number;
   limit: number;
@@ -18,6 +20,7 @@ export const ProductPagination = ({
   return (
     <TablePagination
       component="div"
+      className={styles.pagination}
       count={total}
       page={page}
       rowsPerPage={limit}

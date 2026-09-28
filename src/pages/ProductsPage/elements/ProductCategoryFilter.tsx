@@ -1,12 +1,14 @@
 import {
   FormControl,
   InputLabel,
-  Select,
   MenuItem,
+  Select,
   type SelectChangeEvent,
 } from "@mui/material";
 
 import type { ICategory } from "@/types/products";
+
+import styles from "./ProductCategoryFilter.module.scss";
 
 interface ProductCategoryFilterProps {
   value: string;
@@ -20,11 +22,17 @@ export const ProductCategoryFilter = ({
   onChange,
 }: ProductCategoryFilterProps) => {
   return (
-    <FormControl>
-      <InputLabel>Category</InputLabel>
+    <FormControl className={styles.filter} size="small">
+      <InputLabel id="product-category-label">Category</InputLabel>
 
-      <Select value={value} label="Category" onChange={onChange}>
-        <MenuItem value="">All</MenuItem>
+      <Select
+        labelId="product-category-label"
+        value={value}
+        label="Category"
+        className={styles.select}
+        onChange={onChange}
+      >
+        <MenuItem value="">All categories</MenuItem>
 
         {categories.map((category) => (
           <MenuItem key={category.slug} value={category.slug}>
