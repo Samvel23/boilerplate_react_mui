@@ -1,4 +1,9 @@
-export * from "./ProductGallery";
-export * from "./ProductInfo";
-export * from "./ProductReviews";
-export * from "./ProductForm";
+export { ProductForm } from "./ProductForm";
+
+export type { IProductFormValues } from "./ProductForm";
+
+export { ProductGallery } from "./ProductGallery";
+
+export { ProductInfo } from "./ProductInfo";
+
+export { ProductReviews } from "./ProductReviews";

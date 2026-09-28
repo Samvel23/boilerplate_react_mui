@@ -1,4 +1,5 @@
 import type { IProductsResponse } from "@/types/products";
+
 import { apiClient } from "../client";
 
 interface IGetProductsByCategoryParams {
@@ -12,7 +13,7 @@ interface IGetProductsByCategoryParams {
 
 export const getProductsByCategory = ({
   category,
-  limit = 10,       
+  limit = 10,
   skip = 0,
   sortBy,
   order,
@@ -24,7 +25,7 @@ export const getProductsByCategory = ({
       skip,
       ...(sortBy && { sortBy }),
       ...(order && { order }),
-      signal,
     },
+    signal,
   });
 };

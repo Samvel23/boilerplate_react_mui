@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react";
-import { Box, Paper, TableContainer, Typography } from "@mui/material";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+import { Box, Button, Paper, TableContainer, Typography } from "@mui/material";
+
+import { useNavigate } from "react-router-dom";
 
 import {
   getCategories,
@@ -12,6 +15,8 @@ import type { ICategory, IProduct } from "@/types/products";
 
 import { useDebounce } from "@/hooks/useDebounce";
 
+import { useProductChangesStore } from "@/stores/useProductChangesStore";
+
 import {
   ProductCategoryFilter,
   ProductPagination,
@@ -20,6 +25,12 @@ import {
 } from "./elements";
 
 import { useProductParams } from "./hooks";
+
+import {
+  getCachedProducts,
+  getProductsCacheKey,
+  setCachedProducts,
+} from "./hooks/productsCache";
 
 import styles from "./ProductsPage.module.scss";
 
@@ -39,6 +50,8 @@ export const ProductsPage = () => {
     handleRowsPerPageChange,
   } = useProductParams();
 
+  const navigate = useNavigate();
+
   const [products, setProducts] = useState<IProduct[]>([]);
 
   const [total, setTotal] = useState(0);
@@ -57,12 +70,23 @@ export const ProductsPage = () => {
 
   const previousSearch = useRef(search);
 
-  // Keep search input synchronized with URL
-  useEffect(() => {
-    setSearchInput(search);
-  }, [search]);
+  const createdProducts = useProductChangesStore(
+    (state) => state.createdProducts,
+  );
 
-  // Update URL after search debounce
+  const deletedProductIds = useProductChangesStore(
+    (state) => state.deletedProductIds,
+  );
+
+  const handleCreateProduct = () => {
+    navigate("/products/new");
+  };
+
+  /*
+   * Keep the search input synchronized with
+   * the URL only when the URL changes from
+   * outside the input itself.
+   */
   useEffect(() => {
     if (debouncedSearch === previousSearch.current) {
       return;
@@ -72,7 +96,6 @@ export const ProductsPage = () => {
 
     const params = new URLSearchParams(searchParams);
 
-    // Searching always starts from page 0
     params.set("page", "0");
 
     if (debouncedSearch.trim()) {
@@ -84,16 +107,42 @@ export const ProductsPage = () => {
     setSearchParams(params);
   }, [debouncedSearch, searchParams, setSearchParams]);
 
-  // Fetch products
   useEffect(() => {
     const controller = new AbortController();
 
     let isCurrent = true;
 
+    const cacheKey = getProductsCacheKey({
+      page,
+      limit,
+      sortBy,
+      order,
+      category,
+      search,
+    });
+
+    const cachedResponse = getCachedProducts(cacheKey);
+
     const fetchProducts = async () => {
       try {
         setLoading(true);
         setError(false);
+
+        if (cachedResponse) {
+          await Promise.resolve();
+
+          if (!isCurrent) {
+            return;
+          }
+
+          setProducts(cachedResponse.products);
+
+          setTotal(cachedResponse.total);
+
+          setLoading(false);
+
+          return;
+        }
 
         const skip = page * limit;
 
@@ -131,6 +180,8 @@ export const ProductsPage = () => {
           return;
         }
 
+        setCachedProducts(cacheKey, response.data);
+
         setProducts(response.data.products);
 
         setTotal(response.data.total);
@@ -161,7 +212,6 @@ export const ProductsPage = () => {
     };
   }, [page, limit, sortBy, order, category, search, retryCount]);
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -176,6 +226,104 @@ export const ProductsPage = () => {
     fetchCategories();
   }, []);
 
+  /*
+   * Add locally-created products to the
+   * API products shown in the table.
+   *
+   * Local products are shown on the first
+   * page because the API doesn't know about
+   * them and therefore cannot paginate them.
+   */
+  const visibleProducts = useMemo(() => {
+    const apiProducts = products.filter(
+      (product) => !deletedProductIds.includes(product.id),
+    );
+
+    const localProducts =
+      page === 0
+        ? createdProducts.filter((product) => {
+            if (deletedProductIds.includes(product.id)) {
+              return false;
+            }
+
+            if (category && product.category !== category) {
+              return false;
+            }
+
+            if (search) {
+              const normalizedSearch = search.toLowerCase();
+
+              const matchesTitle = product.title
+                .toLowerCase()
+                .includes(normalizedSearch);
+
+              const matchesDescription = product.description
+                .toLowerCase()
+                .includes(normalizedSearch);
+
+              if (!matchesTitle && !matchesDescription) {
+                return false;
+              }
+            }
+
+            return true;
+          })
+        : [];
+
+    /*
+     * Prevent a locally-created product from
+     * being duplicated if it somehow already
+     * exists in the API response.
+     */
+    const apiProductIds = new Set(apiProducts.map((product) => product.id));
+
+    const uniqueLocalProducts = localProducts.filter(
+      (product) => !apiProductIds.has(product.id),
+    );
+
+    return [...uniqueLocalProducts, ...apiProducts];
+  }, [products, createdProducts, deletedProductIds, page, category, search]);
+
+  const visibleTotal = useMemo(() => {
+    const deletedApiProducts = products.filter((product) =>
+      deletedProductIds.includes(product.id),
+    ).length;
+
+    const matchingLocalProducts =
+      page === 0
+        ? createdProducts.filter((product) => {
+            if (deletedProductIds.includes(product.id)) {
+              return false;
+            }
+
+            if (category && product.category !== category) {
+              return false;
+            }
+
+            if (search) {
+              const normalizedSearch = search.toLowerCase();
+
+              return (
+                product.title.toLowerCase().includes(normalizedSearch) ||
+                product.description.toLowerCase().includes(normalizedSearch)
+              );
+            }
+
+            return true;
+          }).length
+        : 0;
+
+    return total - deletedApiProducts + matchingLocalProducts;
+  }, [
+    total,
+    products,
+    deletedProductIds,
+    createdProducts,
+    page,
+    category,
+    search,
+  ]);
+
   const handleRetry = () => {
     setRetryCount((count) => count + 1);
   };
@@ -184,13 +332,23 @@ export const ProductsPage = () => {
     <Box className={styles.page}>
       <Box className={styles.container}>
         <Box className={styles.header}>
-          <Typography variant="h4" className={styles.title}>
-            Products
-          </Typography>
+          <Box>
+            <Typography variant="h4" className={styles.title}>
+              Products
+            </Typography>
 
-          <Typography variant="body2" className={styles.subtitle}>
-            Browse and manage products
-          </Typography>
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              className={styles.subtitle}
+            >
+              Browse and manage products
+            </Typography>
+          </Box>
+
+          <Button variant="contained" onClick={handleCreateProduct}>
+            Create product
+          </Button>
         </Box>
 
         <Box className={styles.searchSection}>
@@ -211,7 +369,7 @@ export const ProductsPage = () => {
           </Box>
 
           <ProductTable
-            products={products}
+            products={visibleProducts}
             loading={loading}
             error={error}
             sortBy={sortBy}
@@ -224,7 +382,7 @@ export const ProductsPage = () => {
             <ProductPagination
               page={page}
               limit={limit}
-              total={total}
+              total={visibleTotal}
               onPageChange={handlePageChange}
               onRowsPerPageChange={handleRowsPerPageChange}
             />

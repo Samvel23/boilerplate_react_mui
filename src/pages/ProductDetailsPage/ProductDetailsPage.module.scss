@@ -12,8 +12,13 @@
 
 .header {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.header > :first-child {
+  min-width: 0;
 }
 
 .title {
@@ -22,47 +27,122 @@
 }
 
 .card {
+  width: 100%;
   padding: 32px;
   border: 1px solid;
   border-color: var(--mui-palette-divider);
   border-radius: 12px !important;
+  background-color: var(--mui-palette-background-paper);
 }
 
-.content {
-  gap: 40px;
+.productSection {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(0, 0.9fr);
+  gap: 48px;
+  align-items: start;
 }
 
-.formSection {
+.gallerySection {
+  min-width: 0;
+}
+
+.infoSection {
+  min-width: 0;
+}
+
+.localChanges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid;
   border-color: var(--mui-palette-divider);
+}
+
+.sectionCard {
+  width: 100%;
+  padding: 32px;
+  border: 1px solid;
+  border-color: var(--mui-palette-divider);
+  border-radius: 12px !important;
+  background-color: var(--mui-palette-background-paper);
 }
 
 .stateCard {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 48px 32px;
   border: 1px solid;
   border-color: var(--mui-palette-divider);
   border-radius: 12px !important;
+  background-color: var(--mui-palette-background-paper);
   text-align: center;
 }
 
-@media (max-width: 600px) {
+.stateTitle {
+  margin-bottom: 4px !important;
+}
+
+@media (max-width: 1000px) {
+  .productSection {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .gallerySection {
+    width: 100%;
+  }
+
+  .infoSection {
+    width: 100%;
+  }
+}
+
+@media (max-width: 700px) {
   .page {
     padding: 24px 16px;
   }
 
-  .card {
-    padding: 20px;
+  .header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .header :global(.MuiButton-root) {
+    width: 100%;
   }
 
   .title {
     font-size: 1.8rem !important;
   }
 
-  .content {
+  .card,
+  .sectionCard {
+    padding: 20px;
+  }
+
+  .productSection {
     gap: 32px;
+  }
+
+  .localChanges {
+    align-items: stretch;
+    flex-direction: column;
+    margin-top: 24px;
+    padding-top: 20px;
+  }
+
+  .localChanges :global(.MuiButton-root) {
+    width: 100%;
+  }
+
+  .stateCard {
+    padding: 40px 20px;
   }
 }

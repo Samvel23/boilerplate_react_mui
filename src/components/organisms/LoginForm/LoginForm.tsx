@@ -73,9 +73,8 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
     try {
       const res = await loginAuth(values.name, values.password);
 
-      
       const { accessToken, refreshToken, ...user } = res.data;
-      
+
       console.log("accessToken:", accessToken);
       console.log("refreshToken:", refreshToken);
 
@@ -94,7 +93,7 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <FormField error={errors.name}>
+      <FormField>
         <TextField
           label="Username"
           type="text"
@@ -105,7 +104,7 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
         />
       </FormField>
 
-      <FormField error={errors.password}>
+      <FormField>
         <PasswordField
           label="Password"
           value={values.password}

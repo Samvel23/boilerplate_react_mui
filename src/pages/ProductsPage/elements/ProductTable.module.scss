@@ -18,6 +18,7 @@
 }
 
 .row {
+  cursor: pointer;
   transition: background-color 0.2s ease;
 }
 
@@ -91,4 +92,9 @@
   .productTitle {
     max-width: 200px;
   }
+}
+
+.localChip {
+  width: fit-content;
+  margin-top: 4px;
 }

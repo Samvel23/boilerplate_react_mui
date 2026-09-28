@@ -1,11 +1,15 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
-import { Shell } from "@/components";
-import { ProductDetailsPage } from "@/pages";
-import { LoginPage, ProductsPage } from "@/pages";
+import {
+  CreateProductPage,
+  LoginPage,
+  ProductDetailsPage,
+  ProductsPage,
+} from "@/pages";
 
-import { PublicRoute } from "./PublicRoute";
+import { Shell } from "@/components";
 import { ProtectedRoute } from "./ProtectedRoute";
+import { PublicRoute } from "./PublicRoute";
 
 export const AppRouter = () => {
   return (
@@ -16,14 +20,17 @@ export const AppRouter = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Shell />}>
-          <Route path="/" element={<div>Home</div>} />
+          <Route path="/" element={<Navigate to="/products" replace />} />
+
           <Route path="/products" element={<ProductsPage />} />
+
+          <Route path="/products/new" element={<CreateProductPage />} />
+
+          <Route path="/products/:id" element={<ProductDetailsPage />} />
         </Route>
       </Route>
 
-      <Route path="/products/:id" element={<ProductDetailsPage />} />
-
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/products" replace />} />
     </Routes>
   );
 };

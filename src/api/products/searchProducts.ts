@@ -1,4 +1,5 @@
 import type { IProductsResponse } from "@/types/products";
+
 import { apiClient } from "../client";
 
 interface ISearchProductsParams {
@@ -25,7 +26,7 @@ export const searchProducts = ({
       skip,
       ...(sortBy && { sortBy }),
       ...(order && { order }),
-      signal,
     },
+    signal,
   });
 };

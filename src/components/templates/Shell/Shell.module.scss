@@ -1,15 +1,13 @@
 .shell {
+  width: 100%;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
-  width: 100%;
-}
-
-.main {
-  flex: 1;
-  width: 100%;
+  background-color: var(--mui-palette-background-default);
 }
 
 .content {
   width: 100%;
+  flex: 1;
+  min-width: 0;
 }

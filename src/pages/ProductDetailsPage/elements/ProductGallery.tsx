@@ -1,5 +1,6 @@
-import { Box, Stack } from "@mui/material";
 import { useState } from "react";
+
+import { Box, Stack } from "@mui/material";
 
 import type { IProduct } from "@/types/products";
 

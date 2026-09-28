@@ -1,4 +1,6 @@
 .info {
+  display: flex;
+  flex-direction: column;
   gap: 24px;
 }
 
@@ -12,6 +14,7 @@
 .title {
   font-size: 2.1rem !important;
   font-weight: 700 !important;
+  line-height: 1.2 !important;
 }
 
 .brand {
@@ -29,12 +32,29 @@
 }
 
 .price {
-  font-weight: 700 !important;
   margin-bottom: 4px !important;
+  font-weight: 700 !important;
+  font-size: 1.75rem !important;
 }
 
 @media (max-width: 600px) {
+  .info {
+    gap: 20px;
+  }
+
   .title {
     font-size: 1.7rem !important;
+  }
+
+  .rating {
+    gap: 8px;
+  }
+
+  .description {
+    line-height: 1.7 !important;
+  }
+
+  .price {
+    font-size: 1.5rem !important;
   }
 }

@@ -1,5 +1,6 @@
-import type { TThemeMode } from "@/theme/theme";
 import { createContext } from "react";
+
+import type { TThemeMode } from "@/theme/theme";
 
 interface IThemeModeContextValue {
   mode: TThemeMode;

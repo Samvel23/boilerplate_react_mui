@@ -6,14 +6,14 @@ const resources = {
     translation: {
       Login: "Login",
       Welcome: "Welcome back",
-      toContiniue: "Sign in to continiue.",
+      toContinue: "Sign in to continue.",
     },
   },
   fr: {
     translation: {
       Login: "se connecter",
       Welcome: "Content de te revoir",
-      toContiniue: "Connectez-vous pour continuer.",
+      toContinue: "Connectez-vous pour continuer.",
     },
   },
 };

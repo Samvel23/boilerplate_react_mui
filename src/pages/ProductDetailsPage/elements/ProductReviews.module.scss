@@ -3,8 +3,8 @@
 }
 
 .title {
-  font-weight: 700 !important;
   margin-bottom: 4px !important;
+  font-weight: 700 !important;
 }
 
 .empty {
@@ -12,5 +12,16 @@
   border: 1px dashed;
   border-color: var(--mui-palette-divider);
   border-radius: 8px;
+  background-color: var(--mui-palette-background-default);
   text-align: center;
+}
+
+@media (max-width: 600px) {
+  .reviews {
+    gap: 14px;
+  }
+
+  .empty {
+    padding: 20px 16px;
+  }
 }

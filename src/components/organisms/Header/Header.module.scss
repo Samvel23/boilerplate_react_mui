@@ -1,44 +1,137 @@
 .header {
   width: 100%;
   border-bottom: 1px solid var(--mui-palette-divider);
-
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-
-  width: 100%;
-  padding: 12px 24px;
+  background-color: var(--mui-palette-background-paper);
 }
 
-.content {
+.toolbar {
+  width: 100%;
+  min-height: 72px !important;
+  padding: 0 32px !important;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-  min-height: 64px;
-  padding: 12px 24px;
+  gap: 32px;
 }
 
-.title {
-  margin: 0;
-  font-size: 20px;
-  line-height: 28px;
-  font-weight: 600;
+.left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  min-width: 0;
 }
 
-.actions {
+.logo {
+  min-width: auto !important;
+  padding: 6px 0 !important;
+
+  color: var(--mui-palette-text-primary) !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  text-transform: none !important;
+
+  &:hover {
+    background-color: transparent !important;
+  }
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.navigation :global(.MuiButton-root) {
+  min-height: 40px;
+  padding: 8px 14px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: none;
+}
+
+.right {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
-.user {
+.right :global(.MuiIconButton-root) {
+  width: 40px;
+  height: 40px;
+}
+
+.userIcon {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+
+  width: 24px;
+  height: 24px;
+
+  color: var(--mui-palette-text-secondary);
+  font-size: 24px;
+  line-height: 1;
 }
 
-.avatar {
-  cursor: pointer;
+.menu {
+  :global(.MuiPaper-root) {
+    min-width: 180px;
+    margin-top: 8px;
+
+    border: 1px solid var(--mui-palette-divider);
+    border-radius: 10px;
+
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  :global(.MuiMenuItem-root) {
+    min-height: 42px;
+    padding: 8px 14px;
+
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 800px) {
+  .toolbar {
+    min-height: 64px !important;
+    padding: 0 20px !important;
+    gap: 16px;
+  }
+
+  .left {
+    gap: 20px;
+  }
+
+  .navigation {
+    gap: 2px;
+  }
+
+  .navigation :global(.MuiButton-root) {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .toolbar {
+    padding: 0 16px !important;
+  }
+
+  .left {
+    gap: 12px;
+  }
+
+  .navigation {
+    display: none;
+  }
+
+  .logo {
+    font-size: 18px !important;
+  }
 }

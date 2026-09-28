@@ -1,26 +1,30 @@
+import {
+  AppBar,
+  Box,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
-import { Avatar, Menu, MenuItem, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
+import { ThemeToggle } from "@/components/atoms/ThemeToggle";
 import { useUserStore } from "@/stores/useUserStore";
 
 import styles from "./Header.module.scss";
 
 export const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const user = useUserStore((state) => state.user);
   const removeCredentials = useUserStore((state) => state.removeCredentials);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-  const isMenuOpen = Boolean(anchorEl);
-
-  if (!user) {
-    return null;
-  }
-
-  const fullName = `${user.firstName} ${user.lastName}`;
+  const menuOpen = Boolean(anchorEl);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -30,29 +34,94 @@ export const Header = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    removeCredentials();
+  const handleProductsNavigation = () => {
     handleMenuClose();
-
-    navigate("/login", { replace: true });
+    navigate("/products");
   };
 
+  const handleCreateNavigation = () => {
+    handleMenuClose();
+    navigate("/products/new");
+  };
+
+  const handleLogout = () => {
+    handleMenuClose();
+    removeCredentials();
+    navigate("/login");
+  };
+
+  const isProductsPage = location.pathname === "/products";
+
+  const isCreatePage = location.pathname === "/products/new";
+
   return (
-    <header className={styles.header}>
-      <div className={styles.user}>
-        <Typography variant="body1">{fullName}</Typography>
+    <AppBar
+      position="static"
+      color="transparent"
+      elevation={0}
+      className={styles.header}
+    >
+      <Toolbar className={styles.toolbar}>
+        <Box className={styles.left}>
+          <Button
+            type="button"
+            variant="text"
+            onClick={handleProductsNavigation}
+            className={styles.logo}
+          >
+            Products
+          </Button>
 
-        <Avatar
-          src={user.image}
-          alt={fullName}
-          onClick={handleMenuOpen}
-          className={styles.avatar}
-        />
-      </div>
+          <Box className={styles.navigation}>
+            <Button
+              type="button"
+              variant={isProductsPage ? "contained" : "text"}
+              onClick={handleProductsNavigation}
+            >
+              Products
+            </Button>
 
-      <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
-      </Menu>
-    </header>
+            <Button
+              type="button"
+              variant={isCreatePage ? "contained" : "text"}
+              onClick={handleCreateNavigation}
+            >
+              Create product
+            </Button>
+          </Box>
+        </Box>
+
+        <Box className={styles.right}>
+          <ThemeToggle />
+
+          <IconButton
+            type="button"
+            onClick={handleMenuOpen}
+            aria-label="Open user menu"
+            aria-controls={menuOpen ? "user-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={menuOpen ? "true" : undefined}
+          >
+            <Typography component="span" className={styles.userIcon}>
+              ⋮
+            </Typography>
+          </IconButton>
+
+          <Menu
+            id="user-menu"
+            anchorEl={anchorEl}
+            open={menuOpen}
+            onClose={handleMenuClose}
+            className={styles.menu}
+          >
+            <MenuItem onClick={handleProductsNavigation}>Products</MenuItem>
+
+            <MenuItem onClick={handleCreateNavigation}>Create product</MenuItem>
+
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 };
