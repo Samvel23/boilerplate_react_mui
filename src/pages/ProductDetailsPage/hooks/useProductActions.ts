@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import { createProduct } from "@/api/products/createProduct";
 import { deleteProduct } from "@/api/products/deleteProduct";
 import { updateProduct } from "@/api/products/updateProduct";
@@ -10,7 +12,7 @@ import { useProductChangesStore } from "@/stores/useProductChangesStore";
 
 import type { IProduct } from "@/types/products";
 
-export interface ProductFormValues {
+export interface IProductFormValues {
   title: string;
   description: string;
   category: string;
@@ -20,17 +22,12 @@ export interface ProductFormValues {
   imageUrl: string;
 }
 
-let localProductId = 100000;
-
-const createLocalProductId = () => {
-  localProductId += 1;
-
-  return localProductId;
-};
-
 export const useProductActions = (product: IProduct | null) => {
   const [saving, setSaving] = useState(false);
+
   const [deleting, setDeleting] = useState(false);
+
+  const { t } = useTranslation();
 
   const { showToast } = useToast();
 
@@ -62,7 +59,7 @@ export const useProductActions = (product: IProduct | null) => {
     ? createdProducts.some((createdProduct) => createdProduct.id === product.id)
     : false;
 
-  const handleCreate = async (values: ProductFormValues) => {
+  const handleCreate = async (values: IProductFormValues) => {
     try {
       setSaving(true);
 
@@ -80,7 +77,6 @@ export const useProductActions = (product: IProduct | null) => {
 
       const createdProduct: IProduct = {
         ...response.data,
-        id: createLocalProductId(),
         title: values.title.trim(),
         description: values.description.trim(),
         category: values.category,
@@ -95,11 +91,11 @@ export const useProductActions = (product: IProduct | null) => {
 
       addCreatedProduct(createdProduct);
 
-      showToast("Product created successfully.", "success");
+      showToast(t("productActions.created"), "success");
     } catch (error) {
       console.error("Error creating product", error);
 
-      showToast("Failed to create product.", "error");
+      showToast(t("productActions.createFailed"), "error");
 
       throw error;
     } finally {
@@ -107,7 +103,7 @@ export const useProductActions = (product: IProduct | null) => {
     }
   };
 
-  const handleEdit = async (values: ProductFormValues) => {
+  const handleEdit = async (values: IProductFormValues) => {
     if (!product) {
       return;
     }
@@ -139,7 +135,7 @@ export const useProductActions = (product: IProduct | null) => {
        * on the API, regardless of their ID.
        */
       if (isLocalProduct) {
-        showToast("Product updated successfully.", "success");
+        showToast(t("productActions.updated"), "success");
 
         return;
       }
@@ -149,7 +145,7 @@ export const useProductActions = (product: IProduct | null) => {
         data: changes,
       });
 
-      showToast("Product updated successfully.", "success");
+      showToast(t("productActions.updated"), "success");
     } catch (error) {
       discardProductChanges(product.id);
 
@@ -159,7 +155,7 @@ export const useProductActions = (product: IProduct | null) => {
 
       console.error("Error updating product", error);
 
-      showToast("Failed to update product.", "error");
+      showToast(t("productActions.updateFailed"), "error");
     } finally {
       setSaving(false);
     }
@@ -184,7 +180,7 @@ export const useProductActions = (product: IProduct | null) => {
       if (isLocalProduct) {
         deleteProductLocally(product.id);
 
-        showToast("Product deleted successfully.", "success");
+        showToast(t("productActions.deleted"), "success");
 
         return true;
       }
@@ -198,13 +194,13 @@ export const useProductActions = (product: IProduct | null) => {
 
       deleteProductLocally(product.id);
 
-      showToast("Product deleted successfully.", "success");
+      showToast(t("productActions.deleted"), "success");
 
       return true;
     } catch (error) {
       console.error("Error deleting product", error);
 
-      showToast("Failed to delete product.", "error");
+      showToast(t("productActions.deleteFailed"), "error");
 
       return false;
     } finally {

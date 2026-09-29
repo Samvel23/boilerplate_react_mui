@@ -98,6 +98,15 @@
   }
 }
 
+.languageSelect {
+  min-width: 110px;
+
+  :global(.MuiSelect-select) {
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+}
+
 @media (max-width: 800px) {
   .toolbar {
     min-height: 64px !important;

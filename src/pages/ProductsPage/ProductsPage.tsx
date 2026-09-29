@@ -4,6 +4,8 @@ import { Box, Button, Paper, TableContainer, Typography } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 
+import { useTranslation } from "react-i18next";
+
 import {
   getCategories,
   getProducts,
@@ -37,6 +39,8 @@ import {
 import styles from "./ProductsPage.module.scss";
 
 export const ProductsPage = () => {
+  const { t } = useTranslation();
+
   const {
     page,
     limit,
@@ -55,21 +59,14 @@ export const ProductsPage = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState<IProduct[]>([]);
-
   const [total, setTotal] = useState(0);
-
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState(false);
-
   const [retryCount, setRetryCount] = useState(0);
-
   const [categories, setCategories] = useState<ICategory[]>([]);
-
   const [searchInput, setSearchInput] = useState(search);
 
   const debouncedSearch = useDebounce(searchInput, 500);
-
   const previousSearch = useRef(search);
 
   const createdProducts = useProductChangesStore(
@@ -110,7 +107,6 @@ export const ProductsPage = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-
     let isCurrent = true;
 
     const cacheKey = getProductsCacheKey({
@@ -137,9 +133,7 @@ export const ProductsPage = () => {
           }
 
           setProducts(cachedResponse.products);
-
           setTotal(cachedResponse.total);
-
           setLoading(false);
 
           return;
@@ -182,9 +176,7 @@ export const ProductsPage = () => {
         }
 
         setCachedProducts(cacheKey, response.data);
-
         setProducts(response.data.products);
-
         setTotal(response.data.total);
       } catch (error) {
         if (controller.signal.aborted) {
@@ -196,7 +188,6 @@ export const ProductsPage = () => {
         }
 
         setError(true);
-
         console.error("Fetching products failed", error);
       } finally {
         if (isCurrent) {
@@ -217,7 +208,6 @@ export const ProductsPage = () => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
-
         setCategories(response.data);
       } catch (error) {
         console.error("Fetching categories failed", error);
@@ -227,15 +217,6 @@ export const ProductsPage = () => {
     fetchCategories();
   }, []);
 
-  /*
-   * First combine:
-   * - API products
-   * - locally created products
-   * - local edits
-   * - local deletions
-   *
-   * Then apply category/search filtering.
-   */
   const effectiveProducts = useMemo(() => {
     return getEffectiveProducts({
       products,
@@ -245,10 +226,18 @@ export const ProductsPage = () => {
     });
   }, [products, createdProducts, deletedProductIds, productChanges]);
 
-  const visibleProducts = useMemo(() => {
+  const visibleApiProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return effectiveProducts.filter((product) => {
+      if (
+        createdProducts.some(
+          (createdProduct) => createdProduct.id === product.id,
+        )
+      ) {
+        return false;
+      }
+
       if (category && product.category !== category) {
         return false;
       }
@@ -269,22 +258,12 @@ export const ProductsPage = () => {
 
       return true;
     });
-  }, [effectiveProducts, category, search]);
+  }, [effectiveProducts, createdProducts, category, search]);
 
-  /*
-   * API total comes from the backend.
-   * Locally created products are added to it
-   * only when they match the active filters.
-   *
-   * Deleted API products are removed from the
-   * total as well.
-   */
-  const visibleTotal = useMemo(() => {
-    const deletedApiProducts = products.filter((product) =>
-      deletedProductIds.includes(product.id),
-    ).length;
+  const visibleCreatedProducts = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
 
-    const matchingLocalProducts = createdProducts.filter((product) => {
+    return createdProducts.filter((product) => {
       if (deletedProductIds.includes(product.id)) {
         return false;
       }
@@ -293,9 +272,7 @@ export const ProductsPage = () => {
         return false;
       }
 
-      if (search.trim()) {
-        const normalizedSearch = search.trim().toLowerCase();
-
+      if (normalizedSearch) {
         const matchesTitle = product.title
           .toLowerCase()
           .includes(normalizedSearch);
@@ -310,10 +287,46 @@ export const ProductsPage = () => {
       }
 
       return true;
-    }).length;
+    });
+  }, [createdProducts, deletedProductIds, category, search]);
 
-    return total - deletedApiProducts + matchingLocalProducts;
-  }, [total, products, deletedProductIds, createdProducts, category, search]);
+  const deletedApiProductsCount = useMemo(() => {
+    return products.filter((product) => deletedProductIds.includes(product.id))
+      .length;
+  }, [products, deletedProductIds]);
+
+  const visibleApiTotal = Math.max(total - deletedApiProductsCount, 0);
+
+  const visibleTotal = visibleApiTotal + visibleCreatedProducts.length;
+
+  const visibleProducts = useMemo(() => {
+    /*
+     * The API gives us the products for the current page.
+     *
+     * Created products belong after the API dataset, so we calculate
+     * their position globally and then determine which ones belong
+     * on the current page.
+     */
+    const pageStart = page * limit;
+    const pageEnd = pageStart + limit;
+
+    const createdStart = Math.max(pageStart - visibleApiTotal, 0);
+
+    const createdEnd = Math.max(pageEnd - visibleApiTotal, 0);
+
+    const createdProductsForPage = visibleCreatedProducts.slice(
+      createdStart,
+      createdEnd,
+    );
+
+    return [...visibleApiProducts, ...createdProductsForPage];
+  }, [
+    page,
+    limit,
+    visibleApiTotal,
+    visibleApiProducts,
+    visibleCreatedProducts,
+  ]);
 
   const handleRetry = () => {
     setRetryCount((count) => count + 1);
@@ -325,7 +338,7 @@ export const ProductsPage = () => {
         <Box className={styles.header}>
           <Box>
             <Typography variant="h4" className={styles.title}>
-              Products
+              {t("productsPage.title")}
             </Typography>
 
             <Typography
@@ -333,12 +346,16 @@ export const ProductsPage = () => {
               color="text.secondary"
               className={styles.subtitle}
             >
-              Browse and manage products
+              {t("productsPage.subtitle")}
             </Typography>
           </Box>
 
-          <Button variant="contained" onClick={handleCreateProduct}>
-            Create product
+          <Button
+            type="button"
+            variant="contained"
+            onClick={handleCreateProduct}
+          >
+            {t("productsPage.createProduct")}
           </Button>
         </Box>
 

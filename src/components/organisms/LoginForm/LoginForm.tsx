@@ -12,9 +12,10 @@ import type { ILoginFormValues } from "@/types/forms";
 
 import { validateName, validatePassword } from "@/utils/validation";
 
-import styles from "./LoginForm.module.scss";
 import { loginAuth } from "@/api/auth/loginAuth";
 import { useUserStore } from "@/stores/useUserStore";
+
+import styles from "./LoginForm.module.scss";
 
 export interface ILoginFormProps {
   onSubmit?: (values: ILoginFormValues) => void;
@@ -38,12 +39,22 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       ...current,
       name: event.target.value,
     }));
+
+    setErrors((current) => ({
+      ...current,
+      name: undefined,
+    }));
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues((current) => ({
       ...current,
       password: event.target.value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      password: undefined,
     }));
   };
 
@@ -91,8 +102,28 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
     }
   };
 
+  const errorMessages = Object.values(errors).filter((error): error is string =>
+    Boolean(error),
+  );
+
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
+      {errorMessages.length > 0 && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          className={styles.screenReaderErrors}
+        >
+          Please correct the following errors:
+          <ul>
+            {errorMessages.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       <FormField>
         <TextField
           label="Username"
@@ -101,6 +132,7 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
           onChange={handleNameChange}
           error={Boolean(errors.name)}
           autoComplete="username"
+          aria-invalid={Boolean(errors.name)}
         />
       </FormField>
 
@@ -111,6 +143,7 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
           onChange={handlePasswordChange}
           error={Boolean(errors.password)}
           autoComplete="current-password"
+          aria-invalid={Boolean(errors.password)}
         />
       </FormField>
 

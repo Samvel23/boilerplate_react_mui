@@ -2,6 +2,10 @@ import { useMemo } from "react";
 
 import { Box, Typography } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
+import { formatCurrency, getCurrentLanguage } from "@/language";
+
 import type { IStockValueByCategory } from "../../hooks";
 
 import styles from "./InventoryValueChart.module.scss";
@@ -19,6 +23,10 @@ const RIGHT_PADDING = 120;
 const BAR_HEIGHT = 26;
 
 export const InventoryValueChart = ({ data }: IInventoryValueChartProps) => {
+  const { t } = useTranslation();
+
+  const language = getCurrentLanguage();
+
   const maxValue = useMemo(() => {
     return Math.max(...data.map((item) => item.value), 0);
   }, [data]);
@@ -31,7 +39,7 @@ export const InventoryValueChart = ({ data }: IInventoryValueChartProps) => {
     return (
       <Box className={styles.empty}>
         <Typography variant="body2" color="text.secondary">
-          No inventory data available.
+          {t("dashboard.chart.empty")}
         </Typography>
       </Box>
     );
@@ -42,11 +50,11 @@ export const InventoryValueChart = ({ data }: IInventoryValueChartProps) => {
       <Box className={styles.header}>
         <Box>
           <Typography variant="h6" className={styles.title}>
-            Stock Value by Category
+            {t("dashboard.chart.title")}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
-            Inventory value based on price × stock
+            {t("dashboard.chart.subtitle")}
           </Typography>
         </Box>
       </Box>
@@ -56,7 +64,7 @@ export const InventoryValueChart = ({ data }: IInventoryValueChartProps) => {
           viewBox={`0 0 ${CHART_WIDTH} ${chartHeight}`}
           className={styles.chart}
           role="img"
-          aria-label="Stock value by category"
+          aria-label={t("dashboard.chart.ariaLabel")}
         >
           {data.map((item, index) => {
             const y = index * ROW_HEIGHT + ROW_HEIGHT / 2;
@@ -96,10 +104,7 @@ export const InventoryValueChart = ({ data }: IInventoryValueChartProps) => {
                 />
 
                 <text x={valueX} y={y + 5} className={styles.value}>
-                  $
-                  {item.value.toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}
+                  {formatCurrency(item.value, language)}
                 </text>
               </g>
             );

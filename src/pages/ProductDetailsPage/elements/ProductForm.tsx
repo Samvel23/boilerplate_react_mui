@@ -9,6 +9,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import type { ICategory, IProduct } from "@/types/products";
 
 import styles from "./ProductForm.module.scss";
@@ -46,6 +48,8 @@ export const ProductForm = ({
   loading = false,
   onSubmit,
 }: IProductFormProps) => {
+  const { t } = useTranslation();
+
   const [values, setValues] = useState<IProductFormValues>(() =>
     createInitialValues(product),
   );
@@ -106,31 +110,31 @@ export const ProductForm = ({
     const newErrors: Partial<Record<keyof IProductFormValues, string>> = {};
 
     if (!values.title.trim()) {
-      newErrors.title = "Title is required";
+      newErrors.title = t("productForm.titleRequired");
     }
 
     if (!values.description.trim()) {
-      newErrors.description = "Description is required";
+      newErrors.description = t("productForm.descriptionRequired");
     }
 
     if (!values.category.trim()) {
-      newErrors.category = "Category is required";
+      newErrors.category = t("productForm.categoryRequired");
     }
 
     const price = Number(values.price);
 
     if (!values.price.trim()) {
-      newErrors.price = "Price is required";
+      newErrors.price = t("productForm.priceRequired");
     } else if (!Number.isFinite(price) || price <= 0) {
-      newErrors.price = "Price must be greater than 0";
+      newErrors.price = t("productForm.priceGreaterThanZero");
     }
 
     const stock = Number(values.stock);
 
     if (!values.stock.trim()) {
-      newErrors.stock = "Stock is required";
+      newErrors.stock = t("productForm.stockRequired");
     } else if (!Number.isInteger(stock) || stock < 0) {
-      newErrors.stock = "Stock must be a whole number >= 0";
+      newErrors.stock = t("productForm.stockWholeNumber");
     }
 
     setErrors(newErrors);
@@ -172,50 +176,81 @@ export const ProductForm = ({
     onSubmit(values);
   };
 
+  const errorMessages = Object.values(errors).filter((error): error is string =>
+    Boolean(error),
+  );
+
   return (
-    <Box component="form" onSubmit={handleSubmit} className={styles.form}>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      className={styles.form}
+      noValidate
+    >
+      {errorMessages.length > 0 && (
+        <Box
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          className={styles.screenReaderErrors}
+        >
+          {t("productForm.validationSummary")}
+
+          <ul>
+            {errorMessages.map((error) => (
+              <li key={error}>{error}</li>
+            ))}
+          </ul>
+        </Box>
+      )}
+
       <Stack className={styles.content}>
         <Box>
           <Typography variant="h6" className={styles.title}>
-            {product ? "Edit product" : "Create product"}
+            {product
+              ? t("productForm.editTitle")
+              : t("productForm.createTitle")}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
             {product
-              ? "Update the product information below."
-              : "Enter the product information below."}
+              ? t("productForm.editDescription")
+              : t("productForm.createDescription")}
           </Typography>
         </Box>
 
         <TextField
           fullWidth
-          label="Title"
+          label={t("productForm.title")}
           value={values.title}
           onChange={(event) => handleChange("title", event.target.value)}
           error={Boolean(errors.title)}
           helperText={errors.title}
+          aria-invalid={Boolean(errors.title)}
         />
 
         <TextField
           fullWidth
-          label="Description"
+          label={t("productForm.description")}
           multiline
           minRows={4}
           value={values.description}
           onChange={(event) => handleChange("description", event.target.value)}
           error={Boolean(errors.description)}
           helperText={errors.description}
+          aria-invalid={Boolean(errors.description)}
         />
 
         <Box className={styles.grid}>
           <TextField
             select
             fullWidth
-            label="Category"
+            label={t("productForm.category")}
             value={values.category}
             onChange={(event) => handleChange("category", event.target.value)}
             error={Boolean(errors.category)}
-            helperText={errors.category ?? "Choose a product category"}
+            helperText={errors.category ?? t("productForm.chooseCategory")}
+            aria-invalid={Boolean(errors.category)}
           >
             {categories.map((category) => (
               <MenuItem key={category.slug} value={category.slug}>
@@ -226,33 +261,36 @@ export const ProductForm = ({
 
           <TextField
             fullWidth
-            label="Brand"
+            label={t("productForm.brand")}
             value={values.brand}
             onChange={(event) => handleChange("brand", event.target.value)}
             error={Boolean(errors.brand)}
             helperText={errors.brand}
+            aria-invalid={Boolean(errors.brand)}
           />
         </Box>
 
         <TextField
           fullWidth
-          label="Image URL"
+          label={t("productForm.imageUrl")}
           value={values.imageUrl}
           onChange={(event) => handleChange("imageUrl", event.target.value)}
           error={Boolean(errors.imageUrl)}
-          helperText={errors.imageUrl ?? "Use a direct URL to an image"}
-          placeholder="https://example.com/product.jpg"
+          helperText={errors.imageUrl ?? t("productForm.imageUrlHelp")}
+          placeholder={t("productForm.imageUrlPlaceholder")}
+          aria-invalid={Boolean(errors.imageUrl)}
         />
 
         <Box className={styles.grid}>
           <TextField
             fullWidth
-            label="Price"
+            label={t("productForm.price")}
             type="number"
             value={values.price}
             onChange={(event) => handleChange("price", event.target.value)}
             error={Boolean(errors.price)}
             helperText={errors.price}
+            aria-invalid={Boolean(errors.price)}
             slotProps={{
               htmlInput: {
                 min: 0,
@@ -263,12 +301,13 @@ export const ProductForm = ({
 
           <TextField
             fullWidth
-            label="Stock"
+            label={t("productForm.stock")}
             type="number"
             value={values.stock}
             onChange={(event) => handleChange("stock", event.target.value)}
             error={Boolean(errors.stock)}
             helperText={errors.stock}
+            aria-invalid={Boolean(errors.stock)}
             slotProps={{
               htmlInput: {
                 min: 0,
@@ -286,11 +325,11 @@ export const ProductForm = ({
         >
           {loading
             ? product
-              ? "Saving..."
-              : "Creating..."
+              ? t("productForm.saving")
+              : t("productForm.creating")
             : product
-              ? "Save changes"
-              : "Create product"}
+              ? t("productForm.saveChanges")
+              : t("productForm.createProduct")}
         </Button>
 
         {product && !isModified && (
@@ -299,7 +338,7 @@ export const ProductForm = ({
             color="text.secondary"
             className={styles.noChanges}
           >
-            No changes to save
+            {t("productForm.noChanges")}
           </Typography>
         )}
       </Stack>

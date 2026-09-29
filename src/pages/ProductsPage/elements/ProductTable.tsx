@@ -1,4 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
+
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import {
   Box,
@@ -12,9 +14,14 @@ import {
   Typography,
 } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import type { IProduct } from "@/types/products";
 
+import { formatCurrency, getCurrentLanguage } from "@/language";
+
 import { useProductChangesStore } from "@/stores/useProductChangesStore";
+
 import { mergeProductChanges } from "@/utils/products/mergeProductChanges";
 
 import { ProductEmptyState, ProductErrorState, ProductSkeleton } from ".";
@@ -42,6 +49,10 @@ export const ProductTable = ({
 }: ProductTableProps) => {
   const navigate = useNavigate();
 
+  const { t } = useTranslation();
+
+  const language = getCurrentLanguage();
+
   const productChanges = useProductChangesStore(
     (state) => state.productChanges,
   );
@@ -50,26 +61,34 @@ export const ProductTable = ({
     navigate(`/products/${productId}`);
   };
 
-  const effectiveProducts = products.map((product) => {
-    const changes = productChanges[product.id];
+  const effectiveProducts = useMemo(() => {
+    return products.map((product) => {
+      const changes = productChanges[product.id];
 
-    if (!changes) {
-      return product;
-    }
+      if (!changes) {
+        return product;
+      }
 
-    return mergeProductChanges(product, changes);
-  });
+      return mergeProductChanges(product, changes);
+    });
+  }, [products, productChanges]);
 
   return (
     <Box className={styles.wrapper}>
-      <Table className={styles.table} size="medium">
+      <Table
+        className={styles.table}
+        size="medium"
+        aria-label={t("productTable.label")}
+      >
         <TableHead>
           <TableRow className={styles.headerRow}>
-            <TableCell className={styles.idCell}>ID</TableCell>
+            <TableCell className={styles.idCell}>
+              {t("productTable.id")}
+            </TableCell>
 
-            <TableCell>Product</TableCell>
+            <TableCell>{t("productTable.product")}</TableCell>
 
-            <TableCell>Category</TableCell>
+            <TableCell>{t("productTable.category")}</TableCell>
 
             <TableCell>
               <TableSortLabel
@@ -77,7 +96,7 @@ export const ProductTable = ({
                 direction={sortBy === "price" ? order : "asc"}
                 onClick={() => onSort("price")}
               >
-                Price
+                {t("productTable.price")}
               </TableSortLabel>
             </TableCell>
 
@@ -87,7 +106,7 @@ export const ProductTable = ({
                 direction={sortBy === "rating" ? order : "asc"}
                 onClick={() => onSort("rating")}
               >
-                Rating
+                {t("productTable.rating")}
               </TableSortLabel>
             </TableCell>
 
@@ -97,7 +116,7 @@ export const ProductTable = ({
                 direction={sortBy === "stock" ? order : "asc"}
                 onClick={() => onSort("stock")}
               >
-                Stock
+                {t("productTable.stock")}
               </TableSortLabel>
             </TableCell>
           </TableRow>
@@ -128,14 +147,19 @@ export const ProductTable = ({
                       <Box
                         component="img"
                         src={product.thumbnail}
-                        alt={product.title}
+                        alt=""
                         className={styles.thumbnail}
                       />
 
                       <Box className={styles.productInfo}>
                         <Typography
+                          component={RouterLink}
+                          to={`/products/${product.id}`}
                           variant="body2"
                           className={styles.productTitle}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                          }}
                         >
                           {product.title}
                         </Typography>
@@ -148,7 +172,7 @@ export const ProductTable = ({
 
                         {isModified && (
                           <Chip
-                            label="Modified locally"
+                            label={t("productTable.modifiedLocally")}
                             size="small"
                             color="warning"
                             className={styles.localChip}
@@ -168,7 +192,7 @@ export const ProductTable = ({
 
                   <TableCell>
                     <Typography variant="body2" className={styles.price}>
-                      ${product.price}
+                      {formatCurrency(product.price, language)}
                     </Typography>
                   </TableCell>
 

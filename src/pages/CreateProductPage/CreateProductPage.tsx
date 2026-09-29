@@ -1,11 +1,15 @@
 import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
 
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import { createProduct } from "@/api/products/createProduct";
 
 import { useCategories } from "@/hooks";
+
 import { useToast } from "@/hooks/useToast";
 
 import {
@@ -25,6 +29,8 @@ const createRandomRating = () => {
 
 export const CreateProductPage = () => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const { categories, loading: categoriesLoading } = useCategories();
 
@@ -77,13 +83,13 @@ export const CreateProductPage = () => {
        */
       addCreatedProduct(createdProduct);
 
-      showToast("Product created successfully.", "success");
+      showToast(t("productActions.created"), "success");
 
       navigate("/products");
     } catch (error) {
       console.error("Error creating product", error);
 
-      showToast("Failed to create product.", "error");
+      showToast(t("productActions.createFailed"), "error");
     } finally {
       setLoading(false);
     }
@@ -98,15 +104,15 @@ export const CreateProductPage = () => {
       <Stack className={styles.container}>
         <Box className={styles.header}>
           <Button type="button" variant="text" onClick={handleCancel}>
-            ← Back to products
+            ← {t("productDetails.back")}
           </Button>
 
           <Typography variant="h4" className={styles.title}>
-            Create product
+            {t("productForm.createTitle")}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
-            Add a new product to your catalog.
+            {t("productForm.createDescription")}
           </Typography>
         </Box>
 
@@ -124,7 +130,7 @@ export const CreateProductPage = () => {
               disabled={loading}
               onClick={handleCancel}
             >
-              Cancel
+              {t("actions.cancel")}
             </Button>
           </Box>
         </Paper>

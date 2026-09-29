@@ -5,6 +5,37 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>my-react-mui-app</title>
+    <script>
+      (function () {
+        try {
+          var savedMode = localStorage.getItem("theme-mode");
+
+          var mode =
+            savedMode === "light" ||
+            savedMode === "dark" ||
+            savedMode === "system"
+              ? savedMode
+              : "system";
+
+          var resolvedMode = mode;
+
+          if (mode === "system") {
+            resolvedMode = window.matchMedia("(prefers-color-scheme: dark)")
+              .matches
+              ? "dark"
+              : "light";
+          }
+
+          document.documentElement.dataset.theme = resolvedMode;
+
+          document.documentElement.style.colorScheme = resolvedMode;
+        } catch {
+          document.documentElement.dataset.theme = "light";
+
+          document.documentElement.style.colorScheme = "light";
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

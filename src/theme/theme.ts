@@ -6,11 +6,14 @@ import { typography } from "./typography";
 export const themeModes = {
   light: "light",
   dark: "dark",
+  system: "system",
 } as const;
 
 export type TThemeMode = (typeof themeModes)[keyof typeof themeModes];
 
-export const createAppTheme = (mode: TThemeMode) => {
+export type TResolvedThemeMode = "light" | "dark";
+
+export const createAppTheme = (mode: TResolvedThemeMode) => {
   const palette = colors[mode];
 
   return createTheme({
@@ -43,7 +46,14 @@ export const createAppTheme = (mode: TThemeMode) => {
             boxSizing: "border-box",
           },
 
-          "*": "*::before",
+          "*": {
+            boxSizing: "inherit",
+          },
+
+          "*::before": {
+            boxSizing: "inherit",
+          },
+
           "*::after": {
             boxSizing: "inherit",
           },

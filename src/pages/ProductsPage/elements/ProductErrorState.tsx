@@ -1,5 +1,7 @@
 import { Button, TableCell, TableRow, Typography } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import styles from "./ProductErrorState.module.scss";
 
 interface ProductErrorStateProps {
@@ -7,11 +9,13 @@ interface ProductErrorStateProps {
 }
 
 export const ProductErrorState = ({ onRetry }: ProductErrorStateProps) => {
+  const { t } = useTranslation();
+
   return (
     <TableRow>
       <TableCell colSpan={6} className={styles.cell}>
         <Typography variant="body1" className={styles.title}>
-          Failed to load products
+          {t("productError.title")}
         </Typography>
 
         <Typography
@@ -19,11 +23,11 @@ export const ProductErrorState = ({ onRetry }: ProductErrorStateProps) => {
           color="text.secondary"
           className={styles.description}
         >
-          Something went wrong while loading the products. Please try again.
+          {t("productError.description")}
         </Typography>
 
         <Button variant="outlined" onClick={onRetry} className={styles.button}>
-          Retry loading
+          {t("productError.retry")}
         </Button>
       </TableCell>
     </TableRow>

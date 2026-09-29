@@ -10,9 +10,9 @@ interface ThemeRegistryProps {
 }
 
 export const ThemeRegistry = ({ children }: ThemeRegistryProps) => {
-  const { mode } = useThemeMode();
+  const { resolvedMode } = useThemeMode();
 
-  const theme = useMemo(() => createAppTheme(mode), [mode]);
+  const theme = useMemo(() => createAppTheme(resolvedMode), [resolvedMode]);
 
   return (
     <ThemeProvider theme={theme}>

@@ -1,5 +1,7 @@
 import { Box, Chip, Divider, Rating, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
+import { formatCurrency, getCurrentLanguage } from "@/language";
 import type { IProduct } from "@/types/products";
 
 import styles from "./ProductInfo.module.scss";
@@ -9,6 +11,10 @@ interface ProductInfoProps {
 }
 
 export const ProductInfo = ({ product }: ProductInfoProps) => {
+  const { t } = useTranslation();
+
+  const language = getCurrentLanguage();
+
   return (
     <Stack className={styles.info}>
       <Box>
@@ -32,7 +38,11 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
 
         <Chip
           label={
-            product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"
+            product.stock > 0
+              ? t("productInfo.inStock", {
+                  count: product.stock,
+                })
+              : t("productInfo.outOfStock")
           }
           size="small"
           color={product.stock > 0 ? "success" : "error"}
@@ -40,7 +50,9 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
         />
 
         <Chip
-          label={`Rating: ${product.rating}`}
+          label={t("productInfo.rating", {
+            rating: product.rating,
+          })}
           size="small"
           variant="outlined"
         />
@@ -66,11 +78,11 @@ export const ProductInfo = ({ product }: ProductInfoProps) => {
 
       <Box>
         <Typography variant="h5" className={styles.price}>
-          ${product.price}
+          {formatCurrency(product.price, language)}
         </Typography>
 
         <Typography variant="body2" color="text.secondary">
-          Current product price
+          {t("productInfo.currentPrice")}
         </Typography>
       </Box>
     </Stack>

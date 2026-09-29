@@ -1,4 +1,5 @@
 import { TablePagination } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import styles from "./ProductPagination.module.scss";
 
@@ -17,6 +18,8 @@ export const ProductPagination = ({
   onPageChange,
   onRowsPerPageChange,
 }: ProductPaginationProps) => {
+  const { t } = useTranslation();
+
   return (
     <TablePagination
       component="div"
@@ -27,6 +30,12 @@ export const ProductPagination = ({
       onPageChange={onPageChange}
       onRowsPerPageChange={onRowsPerPageChange}
       rowsPerPageOptions={[5, 10, 20, 30]}
+      labelRowsPerPage={t("pagination.rowsPerPage")}
+      labelDisplayedRows={({ from, to, count }) =>
+        `${from}-${to} ${t("products.item", {
+          count,
+        })}`
+      }
     />
   );
 };

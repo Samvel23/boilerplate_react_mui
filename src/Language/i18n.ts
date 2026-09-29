@@ -1,27 +1,70 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-const resources = {
+import type { TLanguage } from "./types";
+
+import { de } from "./locales/de";
+import { en } from "./locales/en";
+import { fr } from "./locales/fr";
+
+const LANGUAGE_STORAGE_KEY = "inventory-language";
+
+const getStoredLanguage = (): TLanguage => {
+  const storedLanguage = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+
+  if (
+    storedLanguage === "en" ||
+    storedLanguage === "fr" ||
+    storedLanguage === "de"
+  ) {
+    return storedLanguage;
+  }
+
+  return "en";
+};
+
+export const resources = {
   en: {
-    translation: {
-      Login: "Login",
-      Welcome: "Welcome back",
-      toContinue: "Sign in to continue.",
-    },
+    common: en.common,
   },
   fr: {
-    translation: {
-      Login: "se connecter",
-      Welcome: "Content de te revoir",
-      toContinue: "Connectez-vous pour continuer.",
-    },
+    common: fr.common,
+  },
+  de: {
+    common: de.common,
   },
 };
-i18n.use(initReactI18next).init({
+
+void i18n.use(initReactI18next).init({
   resources,
-  lng: "en",
+
+  lng: getStoredLanguage(),
+
+  fallbackLng: "en",
+
+  defaultNS: "common",
+
   interpolation: {
     escapeValue: false,
   },
+
+  pluralSeparator: "_",
 });
-export default i18n;
+
+export const changeLanguage = async (language: TLanguage) => {
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+
+  await i18n.changeLanguage(language);
+};
+
+export const getCurrentLanguage = (): TLanguage => {
+  const language = i18n.language;
+
+  if (language === "fr" || language === "de") {
+    return language;
+  }
+
+  return "en";
+};
+
+export { i18n };

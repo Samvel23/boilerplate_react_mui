@@ -1,16 +1,20 @@
 import { Box, Button, Typography } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import styles from "./DashboardErrorState.module.scss";
 
-interface DashboardErrorStateProps {
-  onRetry: () => void;
+interface IDashboardErrorStateProps {
+  onRetry: VoidFunction;
 }
 
-export const DashboardErrorState = ({ onRetry }: DashboardErrorStateProps) => {
+export const DashboardErrorState = ({ onRetry }: IDashboardErrorStateProps) => {
+  const { t } = useTranslation();
+
   return (
     <Box className={styles.wrapper}>
       <Typography variant="h6" className={styles.title}>
-        Unable to load dashboard
+        {t("dashboard.error.title")}
       </Typography>
 
       <Typography
@@ -18,11 +22,11 @@ export const DashboardErrorState = ({ onRetry }: DashboardErrorStateProps) => {
         color="text.secondary"
         className={styles.message}
       >
-        We couldn't load the inventory data. Please try again.
+        {t("dashboard.error.message")}
       </Typography>
 
       <Button type="button" variant="contained" onClick={onRetry}>
-        Try again
+        {t("actions.tryAgain")}
       </Button>
     </Box>
   );

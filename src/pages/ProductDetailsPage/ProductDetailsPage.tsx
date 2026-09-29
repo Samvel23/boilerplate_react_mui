@@ -1,7 +1,11 @@
 import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
+
 import { useNavigate, useParams } from "react-router-dom";
 
+import { useTranslation } from "react-i18next";
+
 import { useCategories } from "@/hooks";
+
 import { useProductChangesStore } from "@/stores/useProductChangesStore";
 
 import {
@@ -17,6 +21,8 @@ import styles from "./ProductDetailsPage.module.scss";
 
 export const ProductDetailsPage = () => {
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
 
   const { id } = useParams<{
     id: string;
@@ -65,7 +71,9 @@ export const ProductDetailsPage = () => {
     return (
       <Box className={styles.page}>
         <Paper elevation={0} className={styles.stateCard}>
-          <Typography color="text.secondary">Loading product...</Typography>
+          <Typography color="text.secondary">
+            {t("productDetails.loading")}
+          </Typography>
         </Paper>
       </Box>
     );
@@ -76,11 +84,11 @@ export const ProductDetailsPage = () => {
       <Box className={styles.page}>
         <Paper elevation={0} className={styles.stateCard}>
           <Typography variant="h6" className={styles.stateTitle}>
-            Product not found
+            {t("productDetails.notFound.title")}
           </Typography>
 
           <Typography variant="body2" color="text.secondary">
-            We couldn't load this product.
+            {t("productDetails.notFound.message")}
           </Typography>
 
           <Button
@@ -88,7 +96,7 @@ export const ProductDetailsPage = () => {
             variant="contained"
             onClick={handleBackToProducts}
           >
-            Back to products
+            {t("productDetails.back")}
           </Button>
         </Paper>
       </Box>
@@ -106,15 +114,15 @@ export const ProductDetailsPage = () => {
               onClick={handleBackToProducts}
               className={styles.backButton}
             >
-              ← Back to products
+              ← {t("productDetails.back")}
             </Button>
 
             <Typography variant="h4" className={styles.title}>
-              Product details
+              {t("productDetails.title")}
             </Typography>
 
             <Typography variant="body2" color="text.secondary">
-              View and manage product information
+              {t("productDetails.subtitle")}
             </Typography>
           </Box>
 
@@ -125,7 +133,9 @@ export const ProductDetailsPage = () => {
             disabled={deleting || saving}
             onClick={handleDeleteProduct}
           >
-            {deleting ? "Deleting..." : "Delete product"}
+            {deleting
+              ? t("productDetails.deleting")
+              : t("productDetails.delete")}
           </Button>
         </Box>
 
@@ -142,7 +152,11 @@ export const ProductDetailsPage = () => {
 
           {isModifiedLocally && (
             <Box className={styles.localChanges}>
-              <Chip label="Modified locally" size="small" color="warning" />
+              <Chip
+                label={t("productDetails.modifiedLocally")}
+                size="small"
+                color="warning"
+              />
 
               <Button
                 type="button"
@@ -151,7 +165,7 @@ export const ProductDetailsPage = () => {
                 size="small"
                 onClick={handleDiscardChanges}
               >
-                Discard local changes
+                {t("productDetails.discardChanges")}
               </Button>
             </Box>
           )}

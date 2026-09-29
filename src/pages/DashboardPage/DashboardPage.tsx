@@ -1,6 +1,8 @@
+import { Box } from "@mui/material";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { Box, Typography } from "@mui/material";
+import { formatCurrency } from "@/language";
 
 import {
   DashboardErrorState,
@@ -18,6 +20,8 @@ import {
 import styles from "./DashboardPage.module.scss";
 
 export const DashboardPage = () => {
+  const { t, i18n } = useTranslation();
+
   const [retryCount, setRetryCount] = useState(0);
 
   const { products, loading, error } = useDashboardProducts(retryCount);
@@ -27,6 +31,9 @@ export const DashboardPage = () => {
 
   const stockValueByCategory = useStockValueByCategory(products);
 
+  const language =
+    i18n.language === "fr" ? "fr" : i18n.language === "de" ? "de" : "en";
+
   const handleRetry = () => {
     setRetryCount((count) => count + 1);
   };
@@ -35,17 +42,9 @@ export const DashboardPage = () => {
     <Box className={styles.page}>
       <Box className={styles.container}>
         <Box className={styles.header}>
-          <Typography variant="h4" className={styles.title}>
-            Dashboard
-          </Typography>
+          <h1 className={styles.title}>{t("dashboard.title")}</h1>
 
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            className={styles.subtitle}
-          >
-            Overview of your product inventory
-          </Typography>
+          <p className={styles.subtitle}>{t("dashboard.subtitle")}</p>
         </Box>
 
         {loading ? (
@@ -56,24 +55,21 @@ export const DashboardPage = () => {
           <>
             <Box className={styles.kpiGrid}>
               <DashboardKpiCard
-                title="Total inventory value"
-                value={`$${totalInventoryValue.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`}
-                description="Current value of all inventory"
+                title={t("dashboard.inventoryValue.title")}
+                value={formatCurrency(totalInventoryValue, language)}
+                description={t("dashboard.inventoryValue.description")}
               />
 
               <DashboardKpiCard
-                title="Low-stock items"
+                title={t("dashboard.lowStock.title")}
                 value={lowStockItems.toString()}
-                description="Products with stock under 10"
+                description={t("dashboard.lowStock.description")}
               />
 
               <DashboardKpiCard
-                title="Average rating"
+                title={t("dashboard.averageRating.title")}
                 value={averageRating.toFixed(1)}
-                description="Average rating across products"
+                description={t("dashboard.averageRating.description")}
               />
             </Box>
 

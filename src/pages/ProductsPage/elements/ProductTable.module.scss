@@ -68,6 +68,14 @@
   font-weight: 600 !important;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: inherit;
+  text-decoration: none;
+}
+
+.productTitle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .price {

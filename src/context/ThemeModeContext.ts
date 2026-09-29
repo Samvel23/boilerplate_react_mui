@@ -1,9 +1,11 @@
 import { createContext } from "react";
 
-import type { TThemeMode } from "@/theme/theme";
+import type { TResolvedThemeMode, TThemeMode } from "@/theme/theme";
 
 interface IThemeModeContextValue {
   mode: TThemeMode;
+  resolvedMode: TResolvedThemeMode;
+  changeMode: (mode: TThemeMode) => void;
   toggleMode: VoidFunction;
 }
 
