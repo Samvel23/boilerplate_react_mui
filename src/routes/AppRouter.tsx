@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import {
   CreateProductPage,
+  DashboardPage,
   LoginPage,
   ProductDetailsPage,
   ProductsPage,
@@ -20,7 +21,7 @@ export const AppRouter = () => {
 
       <Route element={<ProtectedRoute />}>
         <Route element={<Shell />}>
-          <Route path="/" element={<Navigate to="/products" replace />} />
+          <Route path="/" element={<DashboardPage />} />
 
           <Route path="/products" element={<ProductsPage />} />
 

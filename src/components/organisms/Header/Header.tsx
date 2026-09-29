@@ -34,6 +34,11 @@ export const Header = () => {
     setAnchorEl(null);
   };
 
+  const handleHomeNavigation = () => {
+    handleMenuClose();
+    navigate("/");
+  };
+
   const handleProductsNavigation = () => {
     handleMenuClose();
     navigate("/products");
@@ -49,6 +54,8 @@ export const Header = () => {
     removeCredentials();
     navigate("/login");
   };
+
+  const isHomePage = location.pathname === "/";
 
   const isProductsPage = location.pathname === "/products";
 
@@ -66,13 +73,21 @@ export const Header = () => {
           <Button
             type="button"
             variant="text"
-            onClick={handleProductsNavigation}
+            onClick={handleHomeNavigation}
             className={styles.logo}
           >
-            Products
+            Inventory
           </Button>
 
           <Box className={styles.navigation}>
+            <Button
+              type="button"
+              variant={isHomePage ? "contained" : "text"}
+              onClick={handleHomeNavigation}
+            >
+              Home
+            </Button>
+
             <Button
               type="button"
               variant={isProductsPage ? "contained" : "text"}
@@ -114,6 +129,8 @@ export const Header = () => {
             onClose={handleMenuClose}
             className={styles.menu}
           >
+            <MenuItem onClick={handleHomeNavigation}>Home</MenuItem>
+
             <MenuItem onClick={handleProductsNavigation}>Products</MenuItem>
 
             <MenuItem onClick={handleCreateNavigation}>Create product</MenuItem>

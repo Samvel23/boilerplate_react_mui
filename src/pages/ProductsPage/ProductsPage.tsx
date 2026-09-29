@@ -17,6 +17,8 @@ import { useDebounce } from "@/hooks/useDebounce";
 
 import { useProductChangesStore } from "@/stores/useProductChangesStore";
 
+import { getEffectiveProducts } from "@/utils/products/getEffectiveProducts";
+
 import {
   ProductCategoryFilter,
   ProductPagination,
@@ -78,15 +80,14 @@ export const ProductsPage = () => {
     (state) => state.deletedProductIds,
   );
 
+  const productChanges = useProductChangesStore(
+    (state) => state.productChanges,
+  );
+
   const handleCreateProduct = () => {
     navigate("/products/new");
   };
 
-  /*
-   * Keep the search input synchronized with
-   * the URL only when the URL changes from
-   * outside the input itself.
-   */
   useEffect(() => {
     if (debouncedSearch === previousSearch.current) {
       return;
@@ -227,102 +228,92 @@ export const ProductsPage = () => {
   }, []);
 
   /*
-   * Add locally-created products to the
-   * API products shown in the table.
+   * First combine:
+   * - API products
+   * - locally created products
+   * - local edits
+   * - local deletions
    *
-   * Local products are shown on the first
-   * page because the API doesn't know about
-   * them and therefore cannot paginate them.
+   * Then apply category/search filtering.
    */
+  const effectiveProducts = useMemo(() => {
+    return getEffectiveProducts({
+      products,
+      createdProducts,
+      deletedProductIds,
+      productChanges,
+    });
+  }, [products, createdProducts, deletedProductIds, productChanges]);
+
   const visibleProducts = useMemo(() => {
-    const apiProducts = products.filter(
-      (product) => !deletedProductIds.includes(product.id),
-    );
+    const normalizedSearch = search.trim().toLowerCase();
 
-    const localProducts =
-      page === 0
-        ? createdProducts.filter((product) => {
-            if (deletedProductIds.includes(product.id)) {
-              return false;
-            }
+    return effectiveProducts.filter((product) => {
+      if (category && product.category !== category) {
+        return false;
+      }
 
-            if (category && product.category !== category) {
-              return false;
-            }
+      if (normalizedSearch) {
+        const matchesTitle = product.title
+          .toLowerCase()
+          .includes(normalizedSearch);
 
-            if (search) {
-              const normalizedSearch = search.toLowerCase();
+        const matchesDescription = product.description
+          .toLowerCase()
+          .includes(normalizedSearch);
 
-              const matchesTitle = product.title
-                .toLowerCase()
-                .includes(normalizedSearch);
+        if (!matchesTitle && !matchesDescription) {
+          return false;
+        }
+      }
 
-              const matchesDescription = product.description
-                .toLowerCase()
-                .includes(normalizedSearch);
+      return true;
+    });
+  }, [effectiveProducts, category, search]);
 
-              if (!matchesTitle && !matchesDescription) {
-                return false;
-              }
-            }
-
-            return true;
-          })
-        : [];
-
-    /*
-     * Prevent a locally-created product from
-     * being duplicated if it somehow already
-     * exists in the API response.
-     */
-    const apiProductIds = new Set(apiProducts.map((product) => product.id));
-
-    const uniqueLocalProducts = localProducts.filter(
-      (product) => !apiProductIds.has(product.id),
-    );
-
-    return [...uniqueLocalProducts, ...apiProducts];
-  }, [products, createdProducts, deletedProductIds, page, category, search]);
-
+  /*
+   * API total comes from the backend.
+   * Locally created products are added to it
+   * only when they match the active filters.
+   *
+   * Deleted API products are removed from the
+   * total as well.
+   */
   const visibleTotal = useMemo(() => {
     const deletedApiProducts = products.filter((product) =>
       deletedProductIds.includes(product.id),
     ).length;
 
-    const matchingLocalProducts =
-      page === 0
-        ? createdProducts.filter((product) => {
-            if (deletedProductIds.includes(product.id)) {
-              return false;
-            }
+    const matchingLocalProducts = createdProducts.filter((product) => {
+      if (deletedProductIds.includes(product.id)) {
+        return false;
+      }
 
-            if (category && product.category !== category) {
-              return false;
-            }
+      if (category && product.category !== category) {
+        return false;
+      }
 
-            if (search) {
-              const normalizedSearch = search.toLowerCase();
+      if (search.trim()) {
+        const normalizedSearch = search.trim().toLowerCase();
 
-              return (
-                product.title.toLowerCase().includes(normalizedSearch) ||
-                product.description.toLowerCase().includes(normalizedSearch)
-              );
-            }
+        const matchesTitle = product.title
+          .toLowerCase()
+          .includes(normalizedSearch);
 
-            return true;
-          }).length
-        : 0;
+        const matchesDescription = product.description
+          .toLowerCase()
+          .includes(normalizedSearch);
+
+        if (!matchesTitle && !matchesDescription) {
+          return false;
+        }
+      }
+
+      return true;
+    }).length;
 
     return total - deletedApiProducts + matchingLocalProducts;
-  }, [
-    total,
-    products,
-    deletedProductIds,
-    createdProducts,
-    page,
-    category,
-    search,
-  ]);
+  }, [total, products, deletedProductIds, createdProducts, category, search]);
 
   const handleRetry = () => {
     setRetryCount((count) => count + 1);

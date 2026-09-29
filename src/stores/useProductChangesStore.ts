@@ -7,9 +7,7 @@ type ProductChanges = Partial<IProduct>;
 
 interface ProductChangesState {
   productChanges: Record<number, ProductChanges>;
-
   createdProducts: IProduct[];
-
   deletedProductIds: number[];
 
   setProductChanges: (productId: number, changes: ProductChanges) => void;
@@ -26,15 +24,15 @@ interface ProductChangesState {
 const FIRST_LOCAL_PRODUCT_ID = 100000;
 
 const getNextLocalProductId = (products: IProduct[]) => {
-  return (
-    products.reduce(
-      (highest, product) =>
-        product.id >= FIRST_LOCAL_PRODUCT_ID
-          ? Math.max(highest, product.id)
-          : highest,
-      FIRST_LOCAL_PRODUCT_ID,
-    ) + 1
-  );
+  const highestId = products.reduce((highest, product) => {
+    if (product.id >= FIRST_LOCAL_PRODUCT_ID) {
+      return Math.max(highest, product.id);
+    }
+
+    return highest;
+  }, FIRST_LOCAL_PRODUCT_ID);
+
+  return highestId + 1;
 };
 
 export const useProductChangesStore = create<ProductChangesState>()(
@@ -58,22 +56,30 @@ export const useProductChangesStore = create<ProductChangesState>()(
 
       addCreatedProduct: (product) => {
         set((state) => {
-          const nextId = getNextLocalProductId(state.createdProducts);
+          const usedIds = new Set(state.createdProducts.map((item) => item.id));
 
-          const normalizedProduct = {
+          let nextId = getNextLocalProductId(state.createdProducts);
+
+          while (usedIds.has(nextId)) {
+            nextId += 1;
+          }
+
+          const localProduct: IProduct = {
             ...product,
-            id: product.id >= FIRST_LOCAL_PRODUCT_ID ? product.id : nextId,
+            id: nextId,
           };
 
           return {
-            createdProducts: [...state.createdProducts, normalizedProduct],
+            createdProducts: [...state.createdProducts, localProduct],
           };
         });
       },
 
       deleteProductLocally: (productId) => {
         set((state) => ({
-          deletedProductIds: [...state.deletedProductIds, productId],
+          deletedProductIds: state.deletedProductIds.includes(productId)
+            ? state.deletedProductIds
+            : [...state.deletedProductIds, productId],
         }));
       },
 
@@ -97,7 +103,7 @@ export const useProductChangesStore = create<ProductChangesState>()(
     }),
     {
       name: "product-changes",
-      version: 2,
+      version: 3,
 
       migrate: (persistedState) => {
         if (!persistedState) {
@@ -110,16 +116,25 @@ export const useProductChangesStore = create<ProductChangesState>()(
 
         const idMap = new Map<number, number>();
 
+        const usedIds = new Set<number>();
+
         const migratedProducts = state.createdProducts.map((product) => {
-          if (product.id >= FIRST_LOCAL_PRODUCT_ID) {
-            return product;
+          let newId = product.id;
+
+          if (newId < FIRST_LOCAL_PRODUCT_ID || usedIds.has(newId)) {
+            while (usedIds.has(nextId)) {
+              nextId += 1;
+            }
+
+            newId = nextId;
+            nextId += 1;
           }
 
-          const newId = nextId;
+          usedIds.add(newId);
 
-          nextId += 1;
-
-          idMap.set(product.id, newId);
+          if (newId !== product.id) {
+            idMap.set(product.id, newId);
+          }
 
           return {
             ...product,

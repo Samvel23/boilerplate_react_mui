@@ -3,14 +3,15 @@ import { useNavigate } from "react-router-dom";
 
 import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 
+import { createProduct } from "@/api/products/createProduct";
+
 import { useCategories } from "@/hooks";
+import { useToast } from "@/hooks/useToast";
 
 import {
   ProductForm,
   type IProductFormValues,
 } from "@/pages/ProductDetailsPage/elements";
-
-import { createProduct } from "@/api/products/createProduct";
 
 import { useProductChangesStore } from "@/stores/useProductChangesStore";
 
@@ -18,12 +19,8 @@ import type { IProduct } from "@/types/products";
 
 import styles from "./ProductCreatePage.module.scss";
 
-let localProductIdCounter = 0;
-
-const createLocalProductId = () => {
-  localProductIdCounter += 1;
-
-  return -(Date.now() * 1000 + localProductIdCounter);
+const createRandomRating = () => {
+  return Number((1 + Math.random() * 4).toFixed(1));
 };
 
 export const CreateProductPage = () => {
@@ -34,6 +31,8 @@ export const CreateProductPage = () => {
   const addCreatedProduct = useProductChangesStore(
     (state) => state.addCreatedProduct,
   );
+
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(false);
 
@@ -51,34 +50,40 @@ export const CreateProductPage = () => {
       });
 
       const imageUrl =
-        values.imageUrl?.trim() || "https://placehold.co/600x400?text=Product";
+        values.imageUrl.trim() || "https://placehold.co/600x400?text=Product";
 
       const createdProduct: IProduct = {
         ...response.data,
-
-        // DummyJSON can return the same ID for created products.
-        // Use a unique negative ID for products created locally.
-        id: createLocalProductId(),
 
         title: values.title.trim(),
         description: values.description.trim(),
         category: values.category,
         price: Number(values.price),
         stock: Number(values.stock),
+
         brand: values.brand.trim() || undefined,
 
         discountPercentage: response.data.discountPercentage ?? 0,
-        rating: response.data.rating ?? 0,
+
+        rating: createRandomRating(),
 
         thumbnail: imageUrl,
         images: [imageUrl],
       };
 
+      /*
+       * The store is responsible for
+       * generating the local product ID.
+       */
       addCreatedProduct(createdProduct);
+
+      showToast("Product created successfully.", "success");
 
       navigate("/products");
     } catch (error) {
       console.error("Error creating product", error);
+
+      showToast("Failed to create product.", "error");
     } finally {
       setLoading(false);
     }

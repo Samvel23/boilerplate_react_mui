@@ -1,0 +1,26 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 320px;
+  padding: 32px;
+
+  text-align: center;
+
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 16px;
+
+  background: var(--mui-palette-background-paper);
+}
+
+.title {
+  font-weight: 600;
+}
+
+.message {
+  max-width: 420px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
