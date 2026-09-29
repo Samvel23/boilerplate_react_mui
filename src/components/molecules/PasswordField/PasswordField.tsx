@@ -1,0 +1,45 @@
+import { useState } from "react";
+
+import InputAdornment from "@mui/material/InputAdornment";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+
+import {
+  IconButton,
+  AppTextField,
+  type TAppTextFieldProps,
+} from "@/components";
+
+export type TPasswordFieldProps = Omit<TAppTextFieldProps, "type">;
+
+export const PasswordField = ({ slotProps, ...props }: TPasswordFieldProps) => {
+  const [visible, setVisible] = useState(false);
+
+  const toggleVisibility = () => {
+    setVisible((current) => !current);
+  };
+
+  return (
+    <AppTextField
+      {...props}
+      type={visible ? "text" : "password"}
+      slotProps={{
+        ...slotProps,
+        input: {
+          ...slotProps?.input,
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton
+                onClick={toggleVisibility}
+                edge="end"
+                aria-label={visible ? "Hide password" : "Show password"}
+              >
+                {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            </InputAdornment>
+          ),
+        },
+      }}
+    />
+  );
+};
