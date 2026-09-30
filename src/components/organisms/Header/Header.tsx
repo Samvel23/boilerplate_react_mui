@@ -1,22 +1,26 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  FormControl,
-  IconButton,
-  Menu,
-  MenuItem,
-  Select,
-  Toolbar,
-  Typography,
-} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import { useTranslation } from "react-i18next";
 
-import { ThemeToggle } from "@/components/atoms/ThemeToggle";
-import { changeLanguage, getCurrentLanguage, type TLanguage } from "@/language";
+import {
+  Box,
+  Menu,
+  AppBar,
+  Select,
+  Button,
+  Toolbar,
+  MenuItem,
+  Typography,
+  IconButton,
+  FormControl,
+} from "@mui/material";
+
 import { useUserStore } from "@/stores/useUserStore";
+
+import { ThemeToggle } from "@/components/atoms/ThemeToggle";
+
+import { changeLanguage, getCurrentLanguage, type TLanguage } from "@/language";
 
 import styles from "./Header.module.scss";
 
@@ -92,6 +96,7 @@ export const Header = () => {
 
   return (
     <AppBar
+      component="header"
       position="static"
       color="transparent"
       elevation={0}
@@ -104,15 +109,21 @@ export const Header = () => {
             variant="text"
             onClick={handleHomeNavigation}
             className={styles.logo}
+            aria-label={t("appName")}
           >
             {t("appName")}
           </Button>
 
-          <Box className={styles.navigation}>
+          <Box
+            component="nav"
+            aria-label={t("navigation.label")}
+            className={styles.navigation}
+          >
             <Button
               type="button"
               variant={isHomePage ? "contained" : "text"}
               onClick={handleHomeNavigation}
+              aria-current={isHomePage ? "page" : undefined}
             >
               {t("navigation.home")}
             </Button>
@@ -121,6 +132,7 @@ export const Header = () => {
               type="button"
               variant={isProductsPage ? "contained" : "text"}
               onClick={handleProductsNavigation}
+              aria-current={isProductsPage ? "page" : undefined}
             >
               {t("navigation.products")}
             </Button>
@@ -129,6 +141,7 @@ export const Header = () => {
               type="button"
               variant={isCreatePage ? "contained" : "text"}
               onClick={handleCreateNavigation}
+              aria-current={isCreatePage ? "page" : undefined}
             >
               {t("navigation.createProduct")}
             </Button>
@@ -158,9 +171,9 @@ export const Header = () => {
           <IconButton
             type="button"
             onClick={handleMenuOpen}
-            aria-label="Open user menu"
+            aria-label={t("navigation.userMenu")}
             aria-controls={menuOpen ? "user-menu" : undefined}
-            aria-haspopup="true"
+            aria-haspopup="menu"
             aria-expanded={menuOpen ? "true" : undefined}
           >
             <Typography component="span" className={styles.userIcon}>

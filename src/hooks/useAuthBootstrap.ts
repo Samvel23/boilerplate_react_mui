@@ -5,28 +5,62 @@ import { useUserStore } from "@/stores/useUserStore";
 
 export const useAuthBootstrap = () => {
   useEffect(() => {
+    let cancelled = false;
+
     const bootstrap = async () => {
-      const { credentials, setUser, removeCredentials, setInitializing } =
-        useUserStore.getState();
-
-      if (!credentials?.accessToken) {
-        setInitializing(false);
-        return;
-      }
-
       try {
-        const response = await meAuth();
+        await useUserStore.persist.rehydrate();
 
-        setUser(response.data);
+        if (cancelled) {
+          return;
+        }
+
+        const { credentials, setUser, removeCredentials, setInitializing } =
+          useUserStore.getState();
+
+        if (!credentials?.accessToken) {
+          setInitializing(false);
+          return;
+        }
+
+        try {
+          const response = await meAuth();
+
+          if (cancelled) {
+            return;
+          }
+
+          setUser(response.data);
+        } catch (error) {
+          if (cancelled) {
+            return;
+          }
+
+          console.error("Session restore failed:", error);
+          removeCredentials();
+        } finally {
+          if (!cancelled) {
+            setInitializing(false);
+          }
+        }
       } catch (error) {
-        console.error("Session restore failed:", error);
+        if (cancelled) {
+          return;
+        }
+
+        console.error("Auth bootstrap failed:", error);
+
+        const { removeCredentials, setInitializing } = useUserStore.getState();
 
         removeCredentials();
-      } finally {
         setInitializing(false);
       }
     };
 
-    bootstrap();
+    void bootstrap();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 };

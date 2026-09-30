@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useTranslation } from "react-i18next";
 
+import { isLocalProductId } from "@/utils/products/isLocalProductId";
+
 import {
   getCategories,
   getProducts,
@@ -73,8 +75,8 @@ export const ProductsPage = () => {
     (state) => state.createdProducts,
   );
 
-  const deletedProductIds = useProductChangesStore(
-    (state) => state.deletedProductIds,
+  const deletedProducts = useProductChangesStore(
+    (state) => state.deletedProducts,
   );
 
   const productChanges = useProductChangesStore(
@@ -98,6 +100,7 @@ export const ProductsPage = () => {
 
     if (debouncedSearch.trim()) {
       params.set("search", debouncedSearch.trim());
+      params.delete("category");
     } else {
       params.delete("search");
     }
@@ -188,6 +191,7 @@ export const ProductsPage = () => {
         }
 
         setError(true);
+
         console.error("Fetching products failed", error);
       } finally {
         if (isCurrent) {
@@ -208,6 +212,7 @@ export const ProductsPage = () => {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
+
         setCategories(response.data);
       } catch (error) {
         console.error("Fetching categories failed", error);
@@ -221,10 +226,10 @@ export const ProductsPage = () => {
     return getEffectiveProducts({
       products,
       createdProducts,
-      deletedProductIds,
+      deletedProducts,
       productChanges,
     });
-  }, [products, createdProducts, deletedProductIds, productChanges]);
+  }, [products, createdProducts, deletedProducts, productChanges]);
 
   const visibleApiProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -264,7 +269,11 @@ export const ProductsPage = () => {
     const normalizedSearch = search.trim().toLowerCase();
 
     return createdProducts.filter((product) => {
-      if (deletedProductIds.includes(product.id)) {
+      const isDeleted = deletedProducts.some(
+        (deletedProduct) => deletedProduct.id === product.id,
+      );
+
+      if (isDeleted) {
         return false;
       }
 
@@ -288,12 +297,50 @@ export const ProductsPage = () => {
 
       return true;
     });
-  }, [createdProducts, deletedProductIds, category, search]);
+  }, [createdProducts, deletedProducts, category, search]);
 
   const deletedApiProductsCount = useMemo(() => {
-    return products.filter((product) => deletedProductIds.includes(product.id))
-      .length;
-  }, [products, deletedProductIds]);
+    const normalizedSearch = search.trim().toLowerCase();
+
+    return deletedProducts.filter((product) => {
+      /*
+       * Locally-created products are part of the local dataset,
+       * not the API dataset, so they must not reduce the API total.
+       */
+      if (isLocalProductId(product.id)) {
+        return false;
+      }
+
+      /*
+       * Old persisted deleted records may contain only an ID.
+       * Without product information, we cannot safely determine
+       * whether they belong to the current category/search filter.
+       */
+      if (!product.category || !product.title || !product.description) {
+        return false;
+      }
+
+      if (category && product.category !== category) {
+        return false;
+      }
+
+      if (normalizedSearch) {
+        const matchesTitle = product.title
+          .toLowerCase()
+          .includes(normalizedSearch);
+
+        const matchesDescription = product.description
+          .toLowerCase()
+          .includes(normalizedSearch);
+
+        if (!matchesTitle && !matchesDescription) {
+          return false;
+        }
+      }
+
+      return true;
+    }).length;
+  }, [deletedProducts, category, search]);
 
   const visibleApiTotal = Math.max(total - deletedApiProductsCount, 0);
 
@@ -301,11 +348,8 @@ export const ProductsPage = () => {
 
   const visibleProducts = useMemo(() => {
     /*
-     * The API gives us the products for the current page.
-     *
-     * Created products belong after the API dataset, so we calculate
-     * their position globally and then determine which ones belong
-     * on the current page.
+     * API products occupy the first part of the effective dataset.
+     * Created products are appended after the API dataset.
      */
     const pageStart = page * limit;
     const pageEnd = pageStart + limit;
@@ -373,6 +417,7 @@ export const ProductsPage = () => {
               value={category ?? ""}
               categories={categories}
               onChange={handleCategoryChange}
+              disabled={Boolean(search.trim())}
             />
           </Box>
 

@@ -4,6 +4,17 @@ export interface ITranslationResource {
   common: {
     appName: string;
 
+    auth: {
+      welcome: string;
+      toContinue: string;
+      login: string;
+      username: string;
+      password: string;
+      loggingIn: string;
+      loginFailed: string;
+      validationSummary: string;
+    };
+
     navigation: {
       home: string;
       products: string;
@@ -111,6 +122,7 @@ export interface ITranslationResource {
     };
 
     productTable: {
+      label: string;
       id: string;
       product: string;
       category: string;

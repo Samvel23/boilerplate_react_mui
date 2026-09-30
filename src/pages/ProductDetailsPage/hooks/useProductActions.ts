@@ -24,11 +24,9 @@ export interface IProductFormValues {
 
 export const useProductActions = (product: IProduct | null) => {
   const [saving, setSaving] = useState(false);
-
   const [deleting, setDeleting] = useState(false);
 
   const { t } = useTranslation();
-
   const { showToast } = useToast();
 
   const productChanges = useProductChangesStore(
@@ -121,7 +119,6 @@ export const useProductActions = (product: IProduct | null) => {
 
     if (values.imageUrl.trim()) {
       changes.thumbnail = values.imageUrl.trim();
-
       changes.images = [values.imageUrl.trim()];
     }
 
@@ -130,10 +127,6 @@ export const useProductActions = (product: IProduct | null) => {
 
       setProductChanges(product.id, changes);
 
-      /*
-       * Locally-created products don't exist
-       * on the API, regardless of their ID.
-       */
       if (isLocalProduct) {
         showToast(t("productActions.updated"), "success");
 
@@ -169,30 +162,19 @@ export const useProductActions = (product: IProduct | null) => {
     try {
       setDeleting(true);
 
-      /*
-       * Locally-created products should NEVER
-       * make an API DELETE request.
-       *
-       * This works for both:
-       * - old negative IDs
-       * - new positive local IDs
-       */
       if (isLocalProduct) {
-        deleteProductLocally(product.id);
+        deleteProductLocally(product);
 
         showToast(t("productActions.deleted"), "success");
 
         return true;
       }
 
-      /*
-       * Real API product.
-       */
       await deleteProduct({
         id: product.id,
       });
 
-      deleteProductLocally(product.id);
+      deleteProductLocally(product);
 
       showToast(t("productActions.deleted"), "success");
 

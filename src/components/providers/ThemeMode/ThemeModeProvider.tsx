@@ -1,17 +1,17 @@
 import {
-  useCallback,
-  useEffect,
   useMemo,
   useState,
+  useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
 
-import { ThemeModeContext } from "@/context";
 import {
   themeModes,
-  type TResolvedThemeMode,
   type TThemeMode,
+  type TResolvedThemeMode,
 } from "@/theme/theme";
+import { ThemeModeContext } from "@/context";
 
 interface IThemeModeProviderProps {
   children: ReactNode;
@@ -63,6 +63,11 @@ export const ThemeModeProvider = ({ children }: IThemeModeProviderProps) => {
 
   const resolvedMode: TResolvedThemeMode =
     mode === themeModes.system ? systemMode : mode;
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = resolvedMode;
+    document.documentElement.style.colorScheme = resolvedMode;
+  }, [resolvedMode]);
 
   const changeMode = useCallback((nextMode: TThemeMode) => {
     localStorage.setItem(THEME_MODE_KEY, nextMode);

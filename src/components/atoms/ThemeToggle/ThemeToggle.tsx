@@ -1,12 +1,16 @@
+import { useState } from "react";
+
+import { Menu, MenuItem } from "@mui/material";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import SettingsBrightnessIcon from "@mui/icons-material/SettingsBrightness";
-import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+
 import { useTranslation } from "react-i18next";
 
-import { IconButton } from "../IconButton";
 import { useThemeMode } from "@/hooks";
+
+import { IconButton } from "../IconButton";
+
 import { themeModes, type TThemeMode } from "@/theme/theme";
 
 export const ThemeToggle = () => {

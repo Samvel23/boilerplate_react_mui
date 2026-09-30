@@ -6,6 +6,6 @@ export interface IFormFieldProps {
   children: ReactNode;
 }
 
-export const FormField = ({ children }: IFormFieldProps) => {
-  return <div className={styles.field}>{children}</div>;
-};
+export const FormField = ({ children }: IFormFieldProps) => (
+  <div className={styles.field}>{children}</div>
+);

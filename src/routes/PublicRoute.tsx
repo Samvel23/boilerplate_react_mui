@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
+import { RouteLoading } from "@/routes/RouteLoading";
 import { useUserStore } from "@/stores/useUserStore";
 
 export const PublicRoute = () => {
@@ -10,14 +11,18 @@ export const PublicRoute = () => {
   const isInitializing = useUserStore((state) => state.isInitializing);
 
   if (isInitializing) {
-    return null;
+    return <RouteLoading />;
   }
 
   const isAuthenticated = Boolean(user && credentials?.accessToken);
 
   if (isAuthenticated) {
+    const rawRedirect = new URLSearchParams(location.search).get("redirect");
+
     const redirect =
-      new URLSearchParams(location.search).get("redirect") || "/";
+      rawRedirect?.startsWith("/") && !rawRedirect.startsWith("//")
+        ? rawRedirect
+        : "/";
 
     return <Navigate to={redirect} replace />;
   }

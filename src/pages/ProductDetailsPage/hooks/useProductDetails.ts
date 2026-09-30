@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { getProduct } from "@/api/products/getProduct";
 
@@ -11,8 +11,6 @@ import type { IProduct } from "@/types/products";
 export const useProductDetails = (id?: string) => {
   const [fetchedProduct, setFetchedProduct] = useState<IProduct | null>(null);
 
-  const [loading, setLoading] = useState(false);
-
   const [fetchError, setFetchError] = useState(false);
 
   const productChanges = useProductChangesStore(
@@ -23,18 +21,38 @@ export const useProductDetails = (id?: string) => {
     (state) => state.createdProducts,
   );
 
+  const deletedProducts = useProductChangesStore(
+    (state) => state.deletedProducts,
+  );
+
+  const deletedProductIds = useMemo(
+    () => deletedProducts.map((product) => product.id),
+    [deletedProducts],
+  );
+
   const productId = Number(id);
 
-  const isValidProductId = Number.isInteger(productId);
+  const isValidProductId = Number.isInteger(productId) && productId > 0;
 
-  const localProduct = isValidProductId
-    ? (createdProducts.find((item) => item.id === productId) ?? null)
-    : null;
+  const isDeleted = isValidProductId
+    ? deletedProductIds.includes(productId)
+    : false;
 
-  const shouldFetch = isValidProductId && !localProduct;
+  const localProduct =
+    isValidProductId && !isDeleted
+      ? (createdProducts.find((item) => item.id === productId) ?? null)
+      : null;
+
+  const shouldFetch = isValidProductId && !isDeleted && !localProduct;
+
+  const [loading, setLoading] = useState(shouldFetch);
 
   useEffect(() => {
     if (!shouldFetch) {
+      setLoading(false);
+      setFetchedProduct(null);
+      setFetchError(false);
+
       return;
     }
 
@@ -85,7 +103,9 @@ export const useProductDetails = (id?: string) => {
     : null;
 
   const error =
-    !isValidProductId || (!localProduct && !fetchedProduct && fetchError);
+    !isValidProductId ||
+    isDeleted ||
+    (!localProduct && !fetchedProduct && fetchError);
 
   return {
     product,

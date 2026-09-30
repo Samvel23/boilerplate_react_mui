@@ -1,5 +1,6 @@
-import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+
+import { lazy, Suspense, useEffect, useRef } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import { Shell } from "@/components";
 
@@ -37,9 +38,33 @@ const ProductDetailsPage = lazy(() =>
   })),
 );
 
-export const AppRouter = () => {
+const RouteFocus = () => {
+  const location = useLocation();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const initialLocationKey = useRef(location.key);
+
+  useEffect(() => {
+    if (location.key === initialLocationKey.current) {
+      return;
+    }
+
+    initialLocationKey.current = location.key;
+
+    const frameId = requestAnimationFrame(() => {
+      containerRef.current?.focus();
+    });
+
+    return () => {
+      cancelAnimationFrame(frameId);
+    };
+  }, [location.key]);
+
   return (
-    <Suspense fallback={<RouteLoading />}>
+    <div
+      ref={containerRef}
+      tabIndex={-1}
+      style={{ outline: "none" }}
+    >
       <Routes>
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
@@ -55,10 +80,18 @@ export const AppRouter = () => {
 
             <Route path="/products/:id" element={<ProductDetailsPage />} />
           </Route>
-        </Route>
 
-        <Route path="*" element={<Navigate to="/products" replace />} />
+          <Route path="*" element={<Navigate to="/products" replace />} />
+        </Route>
       </Routes>
+    </div>
+  );
+};
+
+export const AppRouter = () => {
+  return (
+    <Suspense fallback={<RouteLoading />}>
+      <RouteFocus />
     </Suspense>
   );
 };

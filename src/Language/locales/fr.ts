@@ -4,6 +4,18 @@ export const fr: ITranslationResource = {
   common: {
     appName: "Inventaire",
 
+    auth: {
+      welcome: "Bienvenue",
+      toContinue: "Connectez-vous pour continuer",
+      login: "Se connecter",
+      username: "Nom d'utilisateur",
+      password: "Mot de passe",
+      loggingIn: "Connexion...",
+      loginFailed:
+        "Échec de la connexion. Vérifiez votre nom d'utilisateur et votre mot de passe.",
+      validationSummary: "Veuillez corriger les erreurs suivantes :",
+    },
+
     navigation: {
       home: "Accueil",
       products: "Produits",
@@ -18,19 +30,6 @@ export const fr: ITranslationResource = {
       retry: "Réessayer",
       back: "Retour aux produits",
       tryAgain: "Réessayer",
-    },
-
-    productInfo: {
-      inStock: "En stock : {{count}}",
-      outOfStock: "Rupture de stock",
-      rating: "Note : {{rating}}",
-      currentPrice: "Prix actuel du produit",
-    },
-
-    productReviews: {
-      title: "Avis",
-      subtitle: "Commentaires des clients",
-      empty: "Les avis apparaîtront ici.",
     },
 
     language: {
@@ -55,6 +54,19 @@ export const fr: ITranslationResource = {
     pagination: {
       rowsPerPage: "Lignes par page :",
       displayedRows: "{{from}}-{{to}} sur {{count}} articles",
+    },
+
+    productInfo: {
+      inStock: "En stock : {{count}}",
+      outOfStock: "Rupture de stock",
+      rating: "Note : {{rating}}",
+      currentPrice: "Prix actuel du produit",
+    },
+
+    productReviews: {
+      title: "Avis",
+      subtitle: "Commentaires des clients",
+      empty: "Les avis apparaîtront ici.",
     },
 
     dashboard: {
@@ -112,6 +124,7 @@ export const fr: ITranslationResource = {
     },
 
     productTable: {
+      label: "Tableau des produits",
       id: "ID",
       product: "Produit",
       category: "Catégorie",
@@ -145,7 +158,7 @@ export const fr: ITranslationResource = {
 
     productForm: {
       createTitle: "Créer un produit",
-      editTitle: "Modifier le produit",
+      editTitle: "Modifier un produit",
 
       createDescription: "Saisissez les informations du produit ci-dessous.",
       editDescription: "Modifiez les informations du produit ci-dessous.",

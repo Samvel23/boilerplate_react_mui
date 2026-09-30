@@ -1,10 +1,13 @@
 import i18n from "i18next";
+
 import { initReactI18next } from "react-i18next";
 
 import type { TLanguage } from "./types";
 
 import { de } from "./locales/de";
+
 import { en } from "./locales/en";
+
 import { fr } from "./locales/fr";
 
 const LANGUAGE_STORAGE_KEY = "inventory-language";
@@ -27,18 +30,26 @@ export const resources = {
   en: {
     common: en.common,
   },
+
   fr: {
     common: fr.common,
   },
+
   de: {
     common: de.common,
   },
 };
 
+const updateHtmlLanguage = (language: TLanguage) => {
+  document.documentElement.lang = language;
+};
+
+const initialLanguage = getStoredLanguage();
+
 void i18n.use(initReactI18next).init({
   resources,
 
-  lng: getStoredLanguage(),
+  lng: initialLanguage,
 
   fallbackLng: "en",
 
@@ -51,10 +62,14 @@ void i18n.use(initReactI18next).init({
   pluralSeparator: "_",
 });
 
+updateHtmlLanguage(initialLanguage);
+
 export const changeLanguage = async (language: TLanguage) => {
   localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
 
   await i18n.changeLanguage(language);
+
+  updateHtmlLanguage(language);
 };
 
 export const getCurrentLanguage = (): TLanguage => {

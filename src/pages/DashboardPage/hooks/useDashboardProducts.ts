@@ -19,8 +19,8 @@ export const useDashboardProducts = (retryCount = 0) => {
     (state) => state.createdProducts,
   );
 
-  const deletedProductIds = useProductChangesStore(
-    (state) => state.deletedProductIds,
+  const deletedProducts = useProductChangesStore(
+    (state) => state.deletedProducts,
   );
 
   const productChanges = useProductChangesStore(
@@ -89,10 +89,10 @@ export const useDashboardProducts = (retryCount = 0) => {
     return getEffectiveProducts({
       products,
       createdProducts,
-      deletedProductIds,
+      deletedProducts,
       productChanges,
     });
-  }, [products, createdProducts, deletedProductIds, productChanges]);
+  }, [products, createdProducts, deletedProducts, productChanges]);
 
   return {
     products: effectiveProducts,

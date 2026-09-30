@@ -16,17 +16,19 @@ interface IProductCategoryFilterProps {
   value: string;
   categories: ICategory[];
   onChange: (event: SelectChangeEvent) => void;
+  disabled: boolean;
 }
 
 export const ProductCategoryFilter = ({
   value,
   categories,
   onChange,
+  disabled = false,
 }: IProductCategoryFilterProps) => {
   const { t } = useTranslation();
 
   return (
-    <FormControl className={styles.filter} size="small">
+    <FormControl className={styles.filter} size="small" disabled={disabled}>
       <InputLabel id="product-category-label">
         {t("productCategoryFilter.label")}
       </InputLabel>
@@ -37,6 +39,7 @@ export const ProductCategoryFilter = ({
         label={t("productCategoryFilter.label")}
         className={styles.select}
         onChange={onChange}
+        disabled={disabled}
       >
         <MenuItem value="">{t("productCategoryFilter.all")}</MenuItem>
 

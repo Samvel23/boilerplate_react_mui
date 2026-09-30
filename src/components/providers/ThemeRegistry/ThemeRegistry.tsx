@@ -3,6 +3,7 @@ import { useMemo, type ReactNode } from "react";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 
 import { useThemeMode } from "@/hooks";
+
 import { createAppTheme } from "@/theme/theme";
 
 interface ThemeRegistryProps {

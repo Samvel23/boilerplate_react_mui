@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
+import { RouteLoading } from "@/routes/RouteLoading";
 import { useUserStore } from "@/stores/useUserStore";
 
 export const ProtectedRoute = () => {
@@ -10,7 +11,7 @@ export const ProtectedRoute = () => {
   const isInitializing = useUserStore((state) => state.isInitializing);
 
   if (isInitializing) {
-    return null;
+    return <RouteLoading />;
   }
 
   const isAuthenticated = Boolean(user && credentials?.accessToken);

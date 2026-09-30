@@ -8,17 +8,19 @@ type ProductChanges = Partial<IProduct>;
 interface ProductChangesState {
   productChanges: Record<number, ProductChanges>;
   createdProducts: IProduct[];
-  deletedProductIds: number[];
+  deletedProducts: IProduct[];
 
   setProductChanges: (productId: number, changes: ProductChanges) => void;
 
   addCreatedProduct: (product: IProduct) => void;
 
-  deleteProductLocally: (productId: number) => void;
+  deleteProductLocally: (product: IProduct) => void;
 
   discardProductChanges: (productId: number) => void;
 
   hasLocalChanges: (productId: number) => boolean;
+
+  clearProductChanges: () => void;
 }
 
 const FIRST_LOCAL_PRODUCT_ID = 100000;
@@ -40,7 +42,7 @@ export const useProductChangesStore = create<ProductChangesState>()(
     (set, get) => ({
       productChanges: {},
       createdProducts: [],
-      deletedProductIds: [],
+      deletedProducts: [],
 
       setProductChanges: (productId, changes) => {
         set((state) => ({
@@ -75,12 +77,20 @@ export const useProductChangesStore = create<ProductChangesState>()(
         });
       },
 
-      deleteProductLocally: (productId) => {
-        set((state) => ({
-          deletedProductIds: state.deletedProductIds.includes(productId)
-            ? state.deletedProductIds
-            : [...state.deletedProductIds, productId],
-        }));
+      deleteProductLocally: (product) => {
+        set((state) => {
+          const alreadyDeleted = state.deletedProducts.some(
+            (deletedProduct) => deletedProduct.id === product.id,
+          );
+
+          if (alreadyDeleted) {
+            return state;
+          }
+
+          return {
+            deletedProducts: [...state.deletedProducts, product],
+          };
+        });
       },
 
       discardProductChanges: (productId) => {
@@ -100,25 +110,38 @@ export const useProductChangesStore = create<ProductChangesState>()(
       hasLocalChanges: (productId) => {
         return Boolean(get().productChanges[productId]);
       },
+
+      clearProductChanges: () => {
+        set({
+          productChanges: {},
+          createdProducts: [],
+          deletedProducts: [],
+        });
+      },
     }),
     {
       name: "product-changes",
-      version: 3,
+      version: 4,
 
       migrate: (persistedState) => {
         if (!persistedState) {
           return persistedState;
         }
 
-        const state = persistedState as ProductChangesState;
+        const state = persistedState as Partial<ProductChangesState> & {
+          deletedProductIds?: number[];
+          deletedProducts?: IProduct[];
+        };
 
-        let nextId = getNextLocalProductId(state.createdProducts);
+        const createdProducts = state.createdProducts ?? [];
+
+        let nextId = getNextLocalProductId(createdProducts);
 
         const idMap = new Map<number, number>();
 
         const usedIds = new Set<number>();
 
-        const migratedProducts = state.createdProducts.map((product) => {
+        const migratedProducts = createdProducts.map((product) => {
           let newId = product.id;
 
           if (newId < FIRST_LOCAL_PRODUCT_ID || usedIds.has(newId)) {
@@ -143,24 +166,40 @@ export const useProductChangesStore = create<ProductChangesState>()(
         });
 
         const migratedChanges = Object.fromEntries(
-          Object.entries(state.productChanges).map(([id, changes]) => {
+          Object.entries(state.productChanges ?? {}).map(([id, changes]) => {
             const oldId = Number(id);
-
             const newId = idMap.get(oldId) ?? oldId;
 
             return [String(newId), changes];
           }),
         );
 
-        const migratedDeletedIds = state.deletedProductIds.map(
-          (id) => idMap.get(id) ?? id,
-        );
+        /*
+         * Version 3 stored only deleted product IDs.
+         *
+         * We cannot reconstruct the full product from those IDs,
+         * so preserve them as lightweight deleted products.
+         *
+         * Products that are encountered and deleted from now on
+         * will contain their complete product data.
+         */
+        const migratedDeletedProducts: IProduct[] = (
+          state.deletedProducts ??
+          (state.deletedProductIds ?? []).map(
+            (id) =>
+              ({
+                id,
+              }) as IProduct,
+          )
+        ).map((product) => ({
+          ...product,
+          id: idMap.get(product.id) ?? product.id,
+        }));
 
         return {
-          ...state,
-          createdProducts: migratedProducts,
           productChanges: migratedChanges,
-          deletedProductIds: migratedDeletedIds,
+          createdProducts: migratedProducts,
+          deletedProducts: migratedDeletedProducts,
         };
       },
     },

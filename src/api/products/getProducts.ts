@@ -22,7 +22,7 @@ export const getProducts = ({
       skip,
       ...(sortBy && { sortBy }),
       ...(order && { order }),
-      signal,
     },
+    signal,
   });
 };

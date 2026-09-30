@@ -4,6 +4,18 @@ export const de: ITranslationResource = {
   common: {
     appName: "Inventar",
 
+    auth: {
+      welcome: "Willkommen",
+      toContinue: "Melden Sie sich an, um fortzufahren",
+      login: "Anmelden",
+      username: "Benutzername",
+      password: "Passwort",
+      loggingIn: "Anmeldung...",
+      loginFailed:
+        "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihren Benutzernamen und Ihr Passwort.",
+      validationSummary: "Bitte korrigieren Sie die folgenden Fehler:",
+    },
+
     navigation: {
       home: "Startseite",
       products: "Produkte",
@@ -18,19 +30,6 @@ export const de: ITranslationResource = {
       retry: "Erneut versuchen",
       back: "Zurück zu den Produkten",
       tryAgain: "Erneut versuchen",
-    },
-
-    productInfo: {
-      inStock: "Auf Lager: {{count}}",
-      outOfStock: "Nicht auf Lager",
-      rating: "Bewertung: {{rating}}",
-      currentPrice: "Aktueller Produktpreis",
-    },
-
-    productReviews: {
-      title: "Bewertungen",
-      subtitle: "Kundenfeedback",
-      empty: "Bewertungen werden hier angezeigt.",
     },
 
     language: {
@@ -55,6 +54,19 @@ export const de: ITranslationResource = {
     pagination: {
       rowsPerPage: "Zeilen pro Seite:",
       displayedRows: "{{from}}–{{to}} von {{count}} Artikeln",
+    },
+
+    productInfo: {
+      inStock: "Auf Lager: {{count}}",
+      outOfStock: "Nicht auf Lager",
+      rating: "Bewertung: {{rating}}",
+      currentPrice: "Aktueller Produktpreis",
+    },
+
+    productReviews: {
+      title: "Bewertungen",
+      subtitle: "Kundenfeedback",
+      empty: "Bewertungen werden hier angezeigt.",
     },
 
     dashboard: {
@@ -112,6 +124,7 @@ export const de: ITranslationResource = {
     },
 
     productTable: {
+      label: "Produkttabelle",
       id: "ID",
       product: "Produkt",
       category: "Kategorie",
@@ -167,7 +180,7 @@ export const de: ITranslationResource = {
       titleRequired: "Titel ist erforderlich",
       descriptionRequired: "Beschreibung ist erforderlich",
       categoryRequired: "Kategorie ist erforderlich",
-      priceRequired: "Preis ist erforderlich",
+      priceRequired: "Der Preis ist erforderlich",
       priceGreaterThanZero: "Der Preis muss größer als 0 sein",
       stockRequired: "Bestand ist erforderlich",
       stockWholeNumber: "Der Bestand muss eine ganze Zahl >= 0 sein",

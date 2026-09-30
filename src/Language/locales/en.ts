@@ -4,6 +4,17 @@ export const en: ITranslationResource = {
   common: {
     appName: "Inventory",
 
+    auth: {
+      welcome: "Welcome",
+      toContinue: "Sign in to continue",
+      login: "Login",
+      username: "Username",
+      password: "Password",
+      loggingIn: "Logging in...",
+      loginFailed: "Login failed. Please check your username and password.",
+      validationSummary: "Please correct the following errors:",
+    },
+
     navigation: {
       home: "Home",
       products: "Products",
@@ -111,6 +122,7 @@ export const en: ITranslationResource = {
     },
 
     productTable: {
+      label: "Products table",
       id: "ID",
       product: "Product",
       category: "Category",

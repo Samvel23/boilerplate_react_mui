@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Stack } from "@mui/material";
 
@@ -15,6 +15,10 @@ export const ProductGallery = ({ product }: ProductGalleryProps) => {
     product.images.length > 0 ? product.images : [product.thumbnail];
 
   const [selectedImage, setSelectedImage] = useState(images[0]);
+
+  useEffect(() => {
+    setSelectedImage(images[0]);
+  }, [product.id, product.images, product.thumbnail]);
 
   return (
     <Box className={styles.gallery}>

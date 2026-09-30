@@ -6,6 +6,6 @@ export interface IFormActionsProps {
   children: ReactNode;
 }
 
-export const FormActions = ({ children }: IFormActionsProps) => {
-  return <div className={styles.actions}>{children}</div>;
-};
+export const FormActions = ({ children }: IFormActionsProps) => (
+  <div className={styles.actions}>{children}</div>
+);

@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
 
+import { useTranslation } from "react-i18next";
+
 import {
   Button,
+  TextField,
   FormField,
   FormActions,
-  TextField,
   PasswordField,
 } from "@/components";
 
@@ -27,12 +29,16 @@ interface ILoginFormErrors {
 }
 
 export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
+  const { t } = useTranslation();
+
   const [values, setValues] = useState<ILoginFormValues>({
-    name: "emilys",
-    password: "emilyspass",
+    name: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState<ILoginFormErrors>({});
+  const [loginError, setLoginError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setValues((current) => ({
@@ -44,6 +50,8 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       ...current,
       name: undefined,
     }));
+
+    setLoginError("");
   };
 
   const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,10 +64,16 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       ...current,
       password: undefined,
     }));
+
+    setLoginError("");
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
 
     const nextErrors: ILoginFormErrors = {};
 
@@ -76,18 +90,18 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
     }
 
     setErrors(nextErrors);
+    setLoginError("");
 
     if (Object.keys(nextErrors).length > 0) {
       return;
     }
 
     try {
+      setIsSubmitting(true);
+
       const res = await loginAuth(values.name, values.password);
 
       const { accessToken, refreshToken, ...user } = res.data;
-
-      console.log("accessToken:", accessToken);
-      console.log("refreshToken:", refreshToken);
 
       useUserStore.getState().setUser(user);
 
@@ -99,6 +113,9 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
       onSubmit?.(values);
     } catch (error) {
       console.error("Login failed:", error);
+      setLoginError(t("auth.loginFailed"));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,7 +132,8 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
           aria-atomic="true"
           className={styles.screenReaderErrors}
         >
-          Please correct the following errors:
+          <p>{t("auth.validationSummary")}</p>
+
           <ul>
             {errorMessages.map((error) => (
               <li key={error}>{error}</li>
@@ -126,11 +144,12 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
 
       <FormField>
         <TextField
-          label="Username"
+          label={t("auth.username")}
           type="text"
           value={values.name}
           onChange={handleNameChange}
           error={Boolean(errors.name)}
+          helperText={errors.name}
           autoComplete="username"
           aria-invalid={Boolean(errors.name)}
         />
@@ -138,18 +157,36 @@ export const LoginForm = ({ onSubmit }: ILoginFormProps) => {
 
       <FormField>
         <PasswordField
-          label="Password"
+          label={t("auth.password")}
           value={values.password}
           onChange={handlePasswordChange}
           error={Boolean(errors.password)}
+          helperText={errors.password}
           autoComplete="current-password"
           aria-invalid={Boolean(errors.password)}
         />
       </FormField>
 
+      {loginError && (
+        <div
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          className={styles.loginError}
+        >
+          {loginError}
+        </div>
+      )}
+
       <FormActions>
-        <Button type="submit" variant="contained" size="large" fullWidth>
-          Login
+        <Button
+          type="submit"
+          variant="contained"
+          size="large"
+          fullWidth
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? t("auth.loggingIn") : t("auth.login")}
         </Button>
       </FormActions>
     </form>

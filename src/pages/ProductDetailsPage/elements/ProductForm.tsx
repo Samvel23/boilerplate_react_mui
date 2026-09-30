@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   Box,
@@ -57,6 +57,11 @@ export const ProductForm = ({
   const [errors, setErrors] = useState<
     Partial<Record<keyof IProductFormValues, string>>
   >({});
+
+  useEffect(() => {
+    setValues(createInitialValues(product));
+    setErrors({});
+  }, [product]);
 
   const handleChange = (field: keyof IProductFormValues, value: string) => {
     setValues((previous) => ({

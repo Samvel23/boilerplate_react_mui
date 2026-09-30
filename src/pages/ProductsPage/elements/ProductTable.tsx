@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-
+ 
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 import {
@@ -59,6 +59,18 @@ export const ProductTable = ({
 
   const handleProductClick = (productId: number) => {
     navigate(`/products/${productId}`);
+  };
+
+  const handleProductKeyDown = (
+    event: React.KeyboardEvent<HTMLTableRowElement>,
+    productId: number,
+  ) => {
+    if (event.key !== "Enter" && event.key !== " ") {
+      return;
+    }
+
+    event.preventDefault();
+    handleProductClick(productId);
   };
 
   const effectiveProducts = useMemo(() => {
@@ -138,7 +150,10 @@ export const ProductTable = ({
                   key={product.id}
                   className={styles.row}
                   hover
+                  tabIndex={0}
                   onClick={() => handleProductClick(product.id)}
+                  onKeyDown={(event) => handleProductKeyDown(event, product.id)}
+                  aria-label={product.title}
                 >
                   <TableCell className={styles.idCell}>{product.id}</TableCell>
 

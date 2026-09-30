@@ -7,24 +7,20 @@ import styles from "./LoginPage.module.scss";
 export const LoginPage = () => {
   const { t } = useTranslation();
 
-  const handleLogin = (values: { name: string; password: string }) => {
-    console.log("Login values:", values);
-  };
-
   return (
     <AuthTemplate>
       <Card className={styles.card}>
         <div className={styles.header}>
           <Typography component="h1" variant="h4" className={styles.title}>
-            {t("Welcome")}
+            {t("auth.welcome")}
           </Typography>
 
           <Typography variant="body1" className={styles.description}>
-            {t("toContinue")}
+            {t("auth.toContinue")}
           </Typography>
         </div>
 
-        <LoginForm onSubmit={handleLogin} />
+        <LoginForm />
       </Card>
     </AuthTemplate>
   );
