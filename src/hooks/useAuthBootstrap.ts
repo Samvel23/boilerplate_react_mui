@@ -36,7 +36,7 @@ export const useAuthBootstrap = () => {
             return;
           }
 
-          console.error("Session restore failed:", error);
+          console.error("Session restoring failed:", error);
           removeCredentials();
         } finally {
           if (!cancelled) {

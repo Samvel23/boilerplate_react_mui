@@ -1,2 +1,2 @@
-export { ToastProvider } from "./ToastProvider";
 export { ToastContext } from "./ToastContext";
+export { ToastProvider } from "./ToastProvider";

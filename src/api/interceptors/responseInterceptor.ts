@@ -19,6 +19,7 @@ interface IRefreshCredentials {
 }
 
 let refreshPromise: Promise<IRefreshCredentials> | null = null;
+
 let isRedirectingToLogin = false;
 
 const refreshAccessToken = async (
